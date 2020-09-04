@@ -78,7 +78,6 @@ const routes = [
         }
     },
     {
-<<<<<<< HEAD
         path: '/purchase/receipt/list',
         name: 'receiptlist',
         component: () => import('../views/transaction/purchase/receipt/List.vue'),
@@ -111,8 +110,6 @@ const routes = [
         }
     },
     {
-=======
->>>>>>> 92ad035e3f4b433a254e6f8ccc33e3729d9305a1
         path: '/login',
         name: 'login',
         component: () => import('../views/Login.vue'),
