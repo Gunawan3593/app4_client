@@ -54,9 +54,25 @@ const routes = [
         }
     },
     {
-        path: '/purchase/order/form',
-        name: 'poform',
+        path: '/purchase/order/edit/:id',
+        name: 'poedit',
         component: () => import('../views/transaction/purchase/order/Form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/purchase/order/add',
+      name: 'ponew',
+      component: () => import('../views/transaction/purchase/order/Form.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/purchase/order/show/:id',
+        name: 'poshow',
+        component: () => import('../views/transaction/purchase/order/Show.vue'),
         meta: {
           requiresAuth: true
         }

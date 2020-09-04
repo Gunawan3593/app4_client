@@ -184,7 +184,7 @@
     </v-app-bar>
     <v-main>
       <v-container>
-          <router-view></router-view>
+          <router-view :key="$route.fullPath"></router-view>
           <Alert :options="alert" />
       </v-container>
     </v-main>

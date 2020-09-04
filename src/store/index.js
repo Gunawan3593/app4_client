@@ -6,6 +6,7 @@ import supplier from '../warehouse/supplier';
 import customer from '../warehouse/customer';
 import category from '../warehouse/category';
 import product from '../warehouse/product';
+import purchaseorder from '../warehouse/purchaseorder';
 
 vue.use(vuex);
 
@@ -22,7 +23,8 @@ export default new vuex.Store({
     supplier,
     customer,
     category,
-    product
+    product,
+    purchaseorder
   }
 });
 
