@@ -44,6 +44,7 @@ const actions = {
             commit('purchaseOrder_Api_error',err);
         }
     },
+<<<<<<< HEAD
     // Get Data Order Receivable by supplier
     async getPOReceivable({ commit },id){
         let data = '';
@@ -63,6 +64,8 @@ const actions = {
             commit('purchaseOrder_Api_error',err);
         }
     },
+=======
+>>>>>>> 92ad035e3f4b433a254e6f8ccc33e3729d9305a1
     // Get Items
     async getPoItem ({ commit }, data) {
         try {
