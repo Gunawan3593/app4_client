@@ -14,10 +14,10 @@
           dark
           flat
         >
-          <v-toolbar-title>Purchase Order List</v-toolbar-title>
+          <v-toolbar-title>Purchase Receipt List</v-toolbar-title>
           <v-tooltip left color="blue">
               <template v-slot:activator="{ on, attrs}">
-                <v-btn icon color="dee-orange" link to="/purchase/order/add" v-bind="attrs" v-on="on"><v-icon>mdi-plus-thick</v-icon></v-btn>
+                <v-btn icon color="dee-orange" link to="/purchase/receipt/add" v-bind="attrs" v-on="on"><v-icon>mdi-plus-thick</v-icon></v-btn>
               </template>
               <span>Add New Transaction</span>
           </v-tooltip>
@@ -113,7 +113,7 @@ export default {
     }
   },
   async mounted(){
-    let data = await this.getPurchaseOrder();
+    let data = await this.getPurchaseReceipt();
     if (data.data.success) {
       this.rows = data.data.data;
       this.rows.forEach(row => {
@@ -130,7 +130,7 @@ export default {
     
   },
   methods: {
-    ...mapActions(['getPurchaseOrder']),
+    ...mapActions(['getPurchaseReceipt']),
     editItem(item) {
       this.$router.push({ path: '/purchase/order/edit/'+item._id, query: { page: this.page }});
     },

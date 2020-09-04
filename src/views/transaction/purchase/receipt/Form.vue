@@ -14,7 +14,7 @@
           dark
           flat
         >
-          <v-toolbar-title>Add Purchase Order</v-toolbar-title>
+          <v-toolbar-title>Add Purchase Receipt</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-title>
               <v-tooltip left>
@@ -25,7 +25,7 @@
               </v-tooltip>
               <v-tooltip left>
               <template v-slot:activator="{ on, attrs}">
-                <v-btn icon color="dee-orange" link to="/purchase/order/add"  v-bind="attrs" v-on="on"><v-icon>mdi-restore</v-icon></v-btn>
+                <v-btn icon color="dee-orange" link to="/purchase/receipt/add"  v-bind="attrs" v-on="on"><v-icon>mdi-restore</v-icon></v-btn>
               </template>
               <span>New Data</span>
               </v-tooltip>
@@ -84,6 +84,7 @@
                     placeholder="Start typing to Search"
                     prepend-icon="mdi-dresser"
                     :return-object="false"
+                    @change="loadOrder($event)"
                     @input="$v.fields.supplier.$touch()"
                     @blur="$v.fields.supplier.$touch()"
                 ></v-autocomplete>
@@ -93,17 +94,21 @@
           <v-row>
             <v-col cols="12" sm="6" md="4">
               <v-autocomplete
-                  v-model="productSelected"
-                  :items="productItems"
-                  :search-input.sync="searchProduct"
-                  hide-no-data
-                  hide-selected
-                  item-text="Description"
-                  label="Product"
-                  placeholder="Select Product"
-                  prepend-icon="mdi-database-search"
-                  return-object
-                  @change="addItem()"
+                    v-model="fields.order"
+                    :error-messages="orderErrors"
+                    required
+                    :items="orderItems"
+                    hide-no-data
+                    hide-selected
+                    item-text="Description"
+                    item-value="_id"
+                    label="Order"
+                    placeholder="Start typing to Search"
+                    prepend-icon="mdi-cart-outline"
+                    :return-object="false"
+                    @change="getOrderItem($event)"
+                    @input="$v.fields.order.$touch()"
+                    @blur="$v.fields.order.$touch()"
                 ></v-autocomplete>
             </v-col>
             <v-col cols="12" sm="6" md="8">
@@ -117,25 +122,19 @@
                   <thead>
                     <tr>
                       <th class="text-center">Name</th>
+                      <th class="text-center" width="100px">Order</th>
                       <th class="text-center" width="100px">Qty</th>
                       <th class="text-center" width="200px;">Cost</th>
                       <th class="text-center" width="200px;">Total</th>
-                      <th class="text-center" width="50px;">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="item in fields.items" :key="item.product">
-                        <td>{{ item.name }}</td>
-                        <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" /></td>
-                        <td class="text-right">{{ item.cost | currency }}</td>
-                        <td class="text-right">{{ item.qty * item.cost | currency }}</td>
-                        <td><v-icon
-                              small
-                              @click="deleteItem(item)"
-                            >
-                              mdi-delete
-                            </v-icon>
-                        </td>
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.order_qty }}</td>
+                      <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" /></td>
+                      <td class="text-right">{{ item.cost | currency }}</td>
+                      <td class="text-right">{{ item.qty * item.cost | currency }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -167,7 +166,8 @@ export default {
   mixins: [validationMixin],
   validations: {
     fields: {
-      supplier: { required }
+      supplier: { required },
+      order: { required }
     }
   },
   computed: {
@@ -178,16 +178,22 @@ export default {
       !this.$v.fields.supplier.required && errors.push('Supplier is required.')
       return errors
     },
+    orderErrors () {
+      const errors = []
+      if (!this.$v.fields.order.$dirty) return errors
+      !this.$v.fields.order.required && errors.push('Order is required.')
+      return errors
+    },
     supplierItems () {
       return this.suppliers.map(supplier => {
         const Description = supplier.name
         return Object.assign({}, supplier, { Description })
       })
     },
-    productItems () {
-      return this.products.map(product => {
-        const Description = product.name
-        return Object.assign({}, product, { Description })
+    orderItems () {
+      return this.orders.map(order => {
+        const Description = order.no
+        return Object.assign({}, order, { Description })
       })
     },
     getSubtotal() {
@@ -206,6 +212,7 @@ export default {
         id: false,
         no: '',
         transdate: '',
+        order: '',
         supplier: '',
         notes: '',
         user: '',
@@ -213,36 +220,12 @@ export default {
       },
       date : '',
       suppliers: [],
+      orders: [],
       products: [],
       isLoading: false,
       menu: false,
-      searchProduct: '',
-      productSelected: '',
       page: ''
     }
-  },
-  watch: {
-    searchProduct() {
-        // Items have already been loaded
-        if (this.products.length > 0) return;
-
-        // Items have already been requested
-        if (this.isLoading) return;
-
-        this.isLoading = true;
-
-        // Lazily load input items
-        fetch('http://localhost:5000/api/products')
-          .then(res => res.json())
-          .then(res => {
-            const products  = res.data;
-            this.products = products;
-          })
-          .catch(err => {
-            console.log(err)
-          })
-          .finally(() => (this.isLoading = false))
-    },
   },
   async mounted(){
     let res = await this.getSupplier();
@@ -262,7 +245,7 @@ export default {
     this.page = page;
   },
   methods: {
-    ...mapActions(['getPoNo','getSupplier','addPurchaseOrder','getPoItem','updatePurchaseOrder','getPurchaseOrder']),
+    ...mapActions(['getPrNo','getSupplier','addPurchaseReceipt','getPoItem','getPrItem','updatePurchaseReceipt','getPurchaseReceipt','getPOReceivable']),
     getDateTime(date){
       const dates = new Date(date);
       const hours = new Date().getHours().toString();
@@ -272,7 +255,7 @@ export default {
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     async loadData(id) {
-      let res = await this.getPurchaseOrder(id);
+      let res = await this.getPurchaseReceipt(id);
       if(res == undefined){
         return this.$router.push({ name: 'polist' });
       }
@@ -286,26 +269,37 @@ export default {
       this.fields.transdate = rspn.transdate;
       this.date = rspn.transdate.slice(0,10);
     },
+    async loadOrder(id){
+      let res = await this.getPOReceivable(id);
+      let data = res.data.data;
+      this.orders = [];
+      this.fields.items = [];
+      if(data != undefined){
+        data.forEach(order => {
+          this.orders.push(order);
+        });
+      }
+    },
     addData() {
         this.isloading = true;
-        this.addPurchaseOrder(this.fields).then(res => {
+        this.addPurchaseReceipt(this.fields).then(res => {
             if(res.data.success) {
                 this.isloading = false;
-                this.$router.push('/purchase/order/list');
+                this.$router.push('/purchase/receipt/list');
             }
         })
     },
     updateData() {
         this.isloading = true;
-        this.updatePurchaseOrder(this.fields).then(res => {
+        this.updatePurchaseReceipt(this.fields).then(res => {
             if(res.data.success) {
                 this.isloading = false;
-                this.$router.push({ name : 'polist', params: { page : this.page }});
+                this.$router.push({ name : 'prlist', params: { page : this.page }});
             }
         })
     },
     async reset(){
-      let data = await this.getPoNo();
+      let data = await this.getPrNo();
       this.fields.id = false;
       this.fields.no = data.data.code;
       this.date = new Date().toISOString().slice(0,10);
@@ -316,47 +310,49 @@ export default {
       this.fields.transdate = new Date();
     },
     getItem(id){
-        let data = {
-          order: id
-        }
-        this.getPoItem(data).then(res => {
-            if(res.data.success) {
-                let items = res.data.data;
-                this.fields.items = [];
-                items.forEach(item => {
-                  item = {
-                    name: item.product.name,
-                    product: item.product._id,
-                    cost: item.cost,
-                    qty: item.qty
-                  }
-                  this.fields.items.push(item);
-                });
-            }
-        });
-    },
-    addItem(){
-      let data = this.productSelected;
-      let index = this.fields.items.findIndex(item => item.product == data._id);
-      if(index >= 0) {
-        this.fields.items[index].qty += 1; 
-      }else{
-        let row = {
-          product: data._id,
-          name: data.name,
-          qty: 1,
-          cost: data.cost
-        }
-        this.fields.items.push(row);
+      let data = {
+        order: id
       }
-      this.productSelected = {};
+      this.getPrItem(data).then(res => {
+          if(res.data.success) {
+              let items = res.data.data;
+              this.fields.items = [];
+              items.forEach(item => {
+                item = {
+                  name: item.product.name,
+                  product: item.product._id,
+                  cost: item.cost,
+                  qty: item.qty
+                }
+                this.fields.items.push(item);
+              });
+          }
+      });
     },
-    deleteItem(item) {
-      let index = this.fields.items.findIndex(row => row.product === item.product);
-      this.fields.items.splice(index, 1);
+    getOrderItem(id){
+      let data = {
+        order: id
+      }
+      this.getPoItem(data).then(res => {
+          if(res.data.success) {
+              let items = res.data.data;
+              this.fields.items = [];
+              items.forEach(item => {
+                item = {
+                  name: item.product.name,
+                  order_item: item._id,
+                  product: item.product._id,
+                  cost: item.cost,
+                  order_qty: item.qty,
+                  qty: item.qty
+                }
+                this.fields.items.push(item);
+              });
+          }
+      });
     },
     Back(){
-        this.$router.push({ name: 'polist', params: { page : this.page }});
+        this.$router.push({ name: 'prlist', params: { page : this.page }});
     },
     submit () {
       this.fields.transdate = this.getDateTime(this.date);

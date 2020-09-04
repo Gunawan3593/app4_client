@@ -54,9 +54,57 @@ const routes = [
         }
     },
     {
-        path: '/purchase/order/form',
-        name: 'poform',
+        path: '/purchase/order/edit/:id',
+        name: 'poedit',
         component: () => import('../views/transaction/purchase/order/Form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/purchase/order/add',
+      name: 'ponew',
+      component: () => import('../views/transaction/purchase/order/Form.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/purchase/order/show/:id',
+        name: 'poshow',
+        component: () => import('../views/transaction/purchase/order/Show.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+        path: '/purchase/receipt/list',
+        name: 'receiptlist',
+        component: () => import('../views/transaction/purchase/receipt/List.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+        path: '/purchase/receipt/edit/:id',
+        name: 'receiptedit',
+        component: () => import('../views/transaction/purchase/receipt/Form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/purchase/receipt/add',
+      name: 'receiptnew',
+      component: () => import('../views/transaction/purchase/receipt/Form.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/purchase/receipt/show/:id',
+        name: 'receiptshow',
+        component: () => import('../views/transaction/purchase/receipt/Show.vue'),
         meta: {
           requiresAuth: true
         }
