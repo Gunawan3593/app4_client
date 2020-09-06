@@ -8,8 +8,8 @@
                 <v-row>
                     <h2 class="ma-1">Purchase Order Detail</h2>
                     <v-spacer></v-spacer>
-                    <v-btn class="ma-1" v-if="status == 1" @click="closeData()" small color="success">Close</v-btn>
-                    <v-btn class="ma-1" v-if="status == 2" @click="openData()" small color="orange" dark>Open</v-btn>
+                    <v-btn class="ma-1" v-if="status == 0" @click="closeData()" small color="success">Close</v-btn>
+                    <v-btn class="ma-1" v-if="status == 1" @click="openData()" small color="orange" dark>Open</v-btn>
                     <v-btn class="ma-1" v-if="status == 0" @click="voidData()" small color="error">Void</v-btn>
                     <v-btn class="ma-1" small color="primary" @click="Back()">Back</v-btn>
                 </v-row>
@@ -88,36 +88,18 @@
                                     v-if="status == 1"
                                     x-small
                                     class="ma-1"
-                                    color="orange"
-                                    text-color="white"
-                                >
-                                    Receiving
-                                </v-chip>
-                                <v-chip
-                                    v-if="status == 2"
-                                    x-small
-                                    class="ma-1"
-                                    color="purple"
+                                    color="green"
                                     text-color="white"
                                 >
                                     Closed
                                 </v-chip>
                                 <v-chip
-                                    v-if="status == 3"
+                                    v-if="status == 2"
                                     x-small
                                     class="ma-1"
                                     color="error"
                                 >
                                     Void
-                                </v-chip>
-                                <v-chip
-                                    v-if="status == 4"
-                                    x-small
-                                    class="ma-1"
-                                    color="green"
-                                    text-color="white"
-                                >
-                                    Done
                                 </v-chip>
                             </td>
                         </tr>
@@ -150,18 +132,18 @@
                             <th class="text-center">Name</th>
                             <th class="text-center" width="50px">Order</th>
                             <th class="text-center" width="50px">Receipt</th>
-                            <th class="text-center" width="50px">Outs.</th>
+                            <th class="text-center" width="50px">Invoice</th>
                             <th class="text-center" width="200px">Cost</th>
                             <th class="text-center" width="200px">Order</th>
-                            <th class="text-center" width="200px">Receipt</th>
+                            <th class="text-center" width="200px">Invoice</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="item in items" :key="item.product">
                                 <td>{{ item.name }}</td>
-                                <td>{{ item.qty }}</td>
+                                <td>{{ item.order_qty }}</td>
                                 <td>{{ item.rcv_qty }}</td>
-                                <td>{{ item.qty - item.rcv_qty }}</td>
+                                <td>{{ item.rcv_qty }}</td>
                                 <td>{{ item.cost | currency }}</td>
                                 <td>{{ item.qty * item.cost | currency }}</td>
                                 <td>{{ item.rcv_qty * item.cost | currency }}</td>
@@ -169,7 +151,7 @@
                             <tr>
                                 <td class="text-center" colspan="5">Total</td>
                                 <td>{{ getSubtotal | currency }}</td>
-                                <td>{{ getTotalReceipt | currency }}</td>
+                                <td>{{ getTotalInvoice | currency }}</td>
                             </tr>
                         </tbody>
                     </template>
@@ -196,7 +178,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getPurchaseOrder','getPoItem','voidPurchaseOrder','closePurchaseOrder','openPurchaseOrder']),
+        ...mapActions(['getPurchaseInvoice','getPiItem','voidPurchaseInvoice','closePurchaseInvoice','openPurchaseInvoice']),
         getDateTime(date){
             const dates = new Date(date);
             const hours = dates.getHours().toString();
@@ -207,9 +189,9 @@ export default {
         },
         getItem(id){
             let data = {
-                order: id
+                invoice: id
             }
-            this.getPoItem(data).then(res => {
+            this.getPiItem(data).then(res => {
                 if(res.data.success) {
                     let items = res.data.data;
                     this.items = [];
@@ -219,7 +201,8 @@ export default {
                         product: item.product._id,
                         cost: item.cost,
                         qty: item.qty,
-                        rcv_qty: item.rcv_qty
+                        rcv_qty: item.rcv_qty,
+                        order_qty: item.order_qty
                     }
                     this.items.push(item);
                     });
@@ -227,7 +210,7 @@ export default {
             });
         },
         async loadData(id) {
-            let res = await this.getPurchaseOrder(id);
+            let res = await this.getPurchaseInvoice(id);
             if (res != undefined) {
                 let rspn = res.data.data;
                 this.id = id;
@@ -244,7 +227,7 @@ export default {
             let data = {
                 id : this.id
             }
-            this.voidPurchaseOrder(data).then(res => {
+            this.voidPurchaseInvoice(data).then(res => {
                 if(res.data.success){
                    this.loadData(this.id);
                 }
@@ -254,7 +237,7 @@ export default {
             let data = {
                 id : this.id
             }
-            this.closePurchaseOrder(data).then(res => {
+            this.closePurchaseInvoice(data).then(res => {
                 if(res.data.success){
                    this.loadData(this.id);
                 }
@@ -264,7 +247,7 @@ export default {
             let data = {
                 id : this.id
             }
-            this.openPurchaseOrder(data).then(res => {
+            this.openPurchaseInvoice(data).then(res => {
                 if(res.data.success){
                    this.loadData(this.id);
                 }
@@ -272,7 +255,7 @@ export default {
         },
         Back(){
             let page = this.$route.query.page;
-            this.$router.push({ name: 'polist', params: { page : page }});
+            this.$router.push({ name: 'pilist', params: { page : page }});
         }
     },
     created(){
@@ -289,12 +272,12 @@ export default {
             }
             return total;
         },
-        getTotalReceipt() {
+        getTotalInvoice() {
             let items = this.items;
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].rcv_qty * items[i].cost;
+                total += items[i].qty * items[i].cost;
             }
             return total;
         }

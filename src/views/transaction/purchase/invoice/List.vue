@@ -14,13 +14,7 @@
           dark
           flat
         >
-          <v-toolbar-title>Purchase Order List</v-toolbar-title>
-          <v-tooltip left color="blue">
-              <template v-slot:activator="{ on, attrs}">
-                <v-btn icon color="dee-orange" link to="/purchase/order/add" v-bind="attrs" v-on="on"><v-icon>mdi-plus-thick</v-icon></v-btn>
-              </template>
-              <span>Add New Transaction</span>
-          </v-tooltip>
+          <v-toolbar-title>Purchase Invoice List</v-toolbar-title>
           <v-spacer></v-spacer>
             <v-text-field
               v-model="search"
@@ -59,21 +53,13 @@
               <v-chip
                 v-if="item.status == 1"
                 class="ma-1"
-                color="orange"
-                text-color="white"
-              >
-                Receiving
-              </v-chip>
-              <v-chip
-                v-if="item.status == 2"
-                class="ma-1"
-                color="purple"
+                color="green"
                 text-color="white"
               >
                 Closed
               </v-chip>
               <v-chip
-                v-if="item.status == 3"
+                v-if="item.status == 2"
                 class="ma-1"
                 color="error"
               >
@@ -157,6 +143,12 @@ export default {
           sortable: false,
           value: 'no',
         },
+        {
+          text: 'Po No.',
+          align: 'start',
+          sortable: false,
+          value: 'order.no',
+        },
         { text: 'Date.', value: 'transdate' },
         { text: 'Supplier', value: 'supplier.name' },
         { text: 'Status', value: 'status' },
@@ -179,12 +171,12 @@ export default {
     
   },
   methods: {
-    ...mapActions(['getPurchaseOrder','genPurchaseInvoice','getPoItem']),
+    ...mapActions(['getPurchaseInvoice']),
     editItem(item) {
-      this.$router.push({ path: '/purchase/order/edit/'+item._id, query: { page: this.page }});
+      this.$router.push({ path: '/purchase/invoice/edit/'+item._id, query: { page: this.page }});
     },
     async loadData(){
-      let data = await this.getPurchaseOrder();
+      let data = await this.getPurchaseInvoice();
       if (data.data.success) {
         this.rows = data.data.data;
         this.rows.forEach(row => {
@@ -201,46 +193,8 @@ export default {
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     showItem(item){
-      this.$router.push({ path: '/purchase/order/show/'+item._id, query: { page: this.page }});
-    },
-    async genInvoice(item){
-      let items = await this.getItem(item._id);
-      let data = {
-        transdate: this.getDateTime(new Date()),
-        supplier: item.supplier._id,
-        order: item._id,
-        notes: 'Generate Invoice Automatically.',
-        user: this.user._id,
-        items: items
-      }
-      this.genPurchaseInvoice(data).then(res => {
-        if(res.data.success) {
-            this.loadData();
-        }
-      });
-    },
-    async getItem(id){
-        let data = {
-          order: id
-        }
-        let items = await this.getPoItem(data);
-        let rspn = items.data.data;
-        let response = [];
-        rspn.forEach(item => {
-          item = {
-            name: item.product.name,
-            product: item.product._id,
-            order_item : item._id,
-            order_qty: item.qty,
-            rcv_qty: item.rcv_qty,
-            qty: item.rcv_qty,
-            cost: item.cost
-          }
-          response.push(item);
-        });
-
-        return response;
-    },
+      this.$router.push({ path: '/purchase/invoice/show/'+item._id, query: { page: this.page }});
+    }
   }
 }
 </script>

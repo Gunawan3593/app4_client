@@ -8,7 +8,7 @@
                 <v-row>
                     <h2 class="ma-1">Purchase Order Detail</h2>
                     <v-spacer></v-spacer>
-                    <v-btn class="ma-1" v-if="status != 3" @click="voidData()" small color="error">Void</v-btn>
+                    <v-btn class="ma-1" v-if="status == 0" @click="voidData()" small color="error">Void</v-btn>
                     <v-btn class="ma-1" small color="primary" @click="Back()">Back</v-btn>
                 </v-row>
             </v-card-text>
@@ -18,7 +18,7 @@
         <v-card
             class="mx-auto"
         >
-            <v-card-text>
+            <v-card-text class="pa-0">
                 <v-simple-table fixed-header dense>
                     <template v-slot:default>
                     <thead>
@@ -54,7 +54,7 @@
         <v-card
             class="mx-auto"
         >
-            <v-card-text>
+            <v-card-text class="pa-0">
                 <v-simple-table fixed-header dense> 
                     <template v-slot:default>
                     <thead>
@@ -82,7 +82,16 @@
                                     Pending
                                 </v-chip>
                                 <v-chip
-                                    v-if="status == 3"
+                                    v-if="status == 1"
+                                    x-small
+                                    class="ma-1"
+                                    color="green"
+                                    text-color="white"
+                                >
+                                    Done
+                                </v-chip>
+                                <v-chip
+                                    v-if="status == 2"
                                     x-small
                                     class="ma-1"
                                     color="error"
@@ -106,12 +115,13 @@
         <v-card
             class="mx-auto"
         >
-            <v-card-text>
+            <v-card-text class="pa-0">
                 <v-simple-table fixed-header dense> 
                     <template v-slot:default>
                         <thead>
                             <tr>
                             <th class="text-center">Name</th>
+                            <th class="text-center">Order</th>
                             <th class="text-center">Qty</th>
                             <th class="text-center">Cost</th>
                             <th class="text-center">Total</th>
@@ -120,6 +130,7 @@
                         <tbody>
                             <tr v-for="item in items" :key="item.product">
                                 <td>{{ item.name }}</td>
+                                <td>{{ item.order_qty }}</td>
                                 <td>{{ item.qty }}</td>
                                 <td>{{ item.cost | currency }}</td>
                                 <td>{{ item.qty * item.cost | currency }}</td>
@@ -153,37 +164,39 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getPurchaseOrder','getPoItem','voidPurchaseOrder']),
+        ...mapActions(['getPurchaseReceipt','getPrItem','voidPurchaseReceipt']),
         getDateTime(date){
             const dates = new Date(date);
             const hours = dates.getHours().toString();
             const minutes = dates.getMinutes().toString();
             const seconds = dates.getSeconds().toString();
-            let time = hours + ':' + minutes + ':' + seconds;
+            let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
             return dates.toISOString().slice(0,10) + ' ' + time;
         },
         getItem(id){
             let data = {
-                order: id
+                receipt: id
             }
-            this.getPoItem(data).then(res => {
+            this.getPrItem(data).then(res => {
                 if(res.data.success) {
                     let items = res.data.data;
                     this.items = [];
                     items.forEach(item => {
-                    item = {
+                        item = {
                         name: item.product.name,
+                        order_item: item.order_item._id,
                         product: item.product._id,
                         cost: item.cost,
+                        order_qty: item.order_qty,
                         qty: item.qty
-                    }
-                    this.items.push(item);
+                        }
+                        this.items.push(item);
                     });
                 }
             });
         },
         async loadData(id) {
-            let res = await this.getPurchaseOrder(id);
+            let res = await this.getPurchaseReceipt(id);
             if (res != undefined) {
                 let rspn = res.data.data;
                 this.id = id;
@@ -200,7 +213,7 @@ export default {
             let data = {
                 id : this.id
             }
-            this.voidPurchaseOrder(data).then(res => {
+            this.voidPurchaseReceipt(data).then(res => {
                 if(res.data.success){
                    this.loadData(this.id);
                 }
@@ -208,7 +221,7 @@ export default {
         },
         Back(){
             let page = this.$route.query.page;
-            this.$router.push({ name: 'polist', params: { page : page }});
+            this.$router.push({ name: 'prlist', params: { page : page }});
         }
     },
     created(){
@@ -229,6 +242,7 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    table th + th { border-left:1px solid #dddddd; }
+    table td + td { border-left:1px solid #dddddd; }
 </style>

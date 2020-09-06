@@ -8,6 +8,7 @@ import category from '../warehouse/category';
 import product from '../warehouse/product';
 import purchaseorder from '../warehouse/purchaseorder';
 import purchasereceipt from '../warehouse/purchasereceipt';
+import purchaseinvoice from '../warehouse/purchaseinvoice';
 
 vue.use(vuex);
 
@@ -26,7 +27,8 @@ export default new vuex.Store({
     category,
     product,
     purchaseorder,
-    purchasereceipt
+    purchasereceipt,
+    purchaseinvoice
   }
 });
 

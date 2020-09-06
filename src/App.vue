@@ -99,7 +99,7 @@
               <v-list-item-title>Purchase Receipt</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item link to="purchase/invoice/list">
+          <v-list-item link to="/purchase/invoice/list">
             <v-list-item-action>
               <v-icon>mdi-notebook</v-icon>
             </v-list-item-action>
