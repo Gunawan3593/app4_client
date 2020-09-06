@@ -8,7 +8,9 @@
                 <v-row>
                     <h2 class="ma-1">Purchase Order Detail</h2>
                     <v-spacer></v-spacer>
-                    <v-btn class="ma-1" v-if="status != 3" @click="voidData()" small color="error">Void</v-btn>
+                    <v-btn class="ma-1" v-if="status == 1" @click="closeData()" small color="success">Close</v-btn>
+                    <v-btn class="ma-1" v-if="status == 2" @click="openData()" small color="orange" dark>Open</v-btn>
+                    <v-btn class="ma-1" v-if="status == 0" @click="voidData()" small color="error">Void</v-btn>
                     <v-btn class="ma-1" small color="primary" @click="Back()">Back</v-btn>
                 </v-row>
             </v-card-text>
@@ -18,7 +20,7 @@
         <v-card
             class="mx-auto"
         >
-            <v-card-text>
+            <v-card-text class="pa-0">
                 <v-simple-table fixed-header dense>
                     <template v-slot:default>
                     <thead>
@@ -54,7 +56,7 @@
         <v-card
             class="mx-auto"
         >
-            <v-card-text>
+            <v-card-text class="pa-0">
                 <v-simple-table fixed-header dense> 
                     <template v-slot:default>
                     <thead>
@@ -73,7 +75,8 @@
                         <tr>
                             <td>Status</td>
                             <td>:</td>
-                            <td><v-chip
+                            <td>
+                                <v-chip
                                     v-if="status == 0"
                                     x-small
                                     class="ma-1"
@@ -82,12 +85,39 @@
                                     Pending
                                 </v-chip>
                                 <v-chip
+                                    v-if="status == 1"
+                                    x-small
+                                    class="ma-1"
+                                    color="orange"
+                                    text-color="white"
+                                >
+                                    Receiving
+                                </v-chip>
+                                <v-chip
+                                    v-if="status == 2"
+                                    x-small
+                                    class="ma-1"
+                                    color="purple"
+                                    text-color="white"
+                                >
+                                    Closed
+                                </v-chip>
+                                <v-chip
                                     v-if="status == 3"
                                     x-small
                                     class="ma-1"
                                     color="error"
                                 >
                                     Void
+                                </v-chip>
+                                <v-chip
+                                    v-if="status == 4"
+                                    x-small
+                                    class="ma-1"
+                                    color="green"
+                                    text-color="white"
+                                >
+                                    Done
                                 </v-chip>
                             </td>
                         </tr>
@@ -106,27 +136,40 @@
         <v-card
             class="mx-auto"
         >
-            <v-card-text>
+            <v-card-text class="pa-0">
                 <v-simple-table fixed-header dense> 
                     <template v-slot:default>
                         <thead>
                             <tr>
+                                <th></th>
+                                <th colspan="3" class="text-center">Qty</th>
+                                <th></th>
+                                <th colspan="2" class="text-center">Total</th>
+                            </tr>
+                            <tr>
                             <th class="text-center">Name</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-center">Cost</th>
-                            <th class="text-center">Total</th>
+                            <th class="text-center" width="50px">Order</th>
+                            <th class="text-center" width="50px">Receipt</th>
+                            <th class="text-center" width="50px">Outs.</th>
+                            <th class="text-center" width="200px">Cost</th>
+                            <th class="text-center" width="200px">Order</th>
+                            <th class="text-center" width="200px">Receipt</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="item in items" :key="item.product">
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.qty }}</td>
+                                <td>{{ item.rcv_qty }}</td>
+                                <td>{{ item.qty - item.rcv_qty }}</td>
                                 <td>{{ item.cost | currency }}</td>
                                 <td>{{ item.qty * item.cost | currency }}</td>
+                                <td>{{ item.rcv_qty * item.cost | currency }}</td>
                             </tr>
                             <tr>
-                                <td class="text-center" colspan="3">Total</td>
+                                <td class="text-center" colspan="5">Total</td>
                                 <td>{{ getSubtotal | currency }}</td>
+                                <td>{{ getTotalReceipt | currency }}</td>
                             </tr>
                         </tbody>
                     </template>
@@ -153,13 +196,13 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getPurchaseOrder','getPoItem','voidPurchaseOrder']),
+        ...mapActions(['getPurchaseOrder','getPoItem','voidPurchaseOrder','closePurchaseOrder','openPurchaseOrder']),
         getDateTime(date){
             const dates = new Date(date);
             const hours = dates.getHours().toString();
             const minutes = dates.getMinutes().toString();
             const seconds = dates.getSeconds().toString();
-            let time = hours + ':' + minutes + ':' + seconds;
+            let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
             return dates.toISOString().slice(0,10) + ' ' + time;
         },
         getItem(id){
@@ -175,7 +218,8 @@ export default {
                         name: item.product.name,
                         product: item.product._id,
                         cost: item.cost,
-                        qty: item.qty
+                        qty: item.qty,
+                        rcv_qty: item.rcv_qty
                     }
                     this.items.push(item);
                     });
@@ -206,6 +250,26 @@ export default {
                 }
             })
         },
+        closeData(){
+            let data = {
+                id : this.id
+            }
+            this.closePurchaseOrder(data).then(res => {
+                if(res.data.success){
+                   this.loadData(this.id);
+                }
+            })
+        },
+        openData(){
+            let data = {
+                id : this.id
+            }
+            this.openPurchaseOrder(data).then(res => {
+                if(res.data.success){
+                   this.loadData(this.id);
+                }
+            })
+        },
         Back(){
             let page = this.$route.query.page;
             this.$router.push({ name: 'polist', params: { page : page }});
@@ -224,11 +288,21 @@ export default {
                 total += items[i].qty * items[i].cost;
             }
             return total;
+        },
+        getTotalReceipt() {
+            let items = this.items;
+            if (items.length == 0) return;
+            let total = 0;
+            for(var i=0;i<items.length;i++){
+                total += items[i].rcv_qty * items[i].cost;
+            }
+            return total;
         }
     }
 }
 </script>
 
-<style>
-
+<style scoped>
+    table th + th { border-left:1px solid #dddddd; }
+    table td + td { border-left:1px solid #dddddd; }
 </style>

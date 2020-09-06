@@ -79,7 +79,7 @@ const routes = [
     },
     {
         path: '/purchase/receipt/list',
-        name: 'receiptlist',
+        name: 'prlist',
         component: () => import('../views/transaction/purchase/receipt/List.vue'),
         meta: {
           requiresAuth: true
@@ -87,7 +87,7 @@ const routes = [
     },
     {
         path: '/purchase/receipt/edit/:id',
-        name: 'receiptedit',
+        name: 'predit',
         component: () => import('../views/transaction/purchase/receipt/Form.vue'),
         meta: {
           requiresAuth: true
@@ -95,7 +95,7 @@ const routes = [
     },
     {
       path: '/purchase/receipt/add',
-      name: 'receiptnew',
+      name: 'prnew',
       component: () => import('../views/transaction/purchase/receipt/Form.vue'),
       meta: {
         requiresAuth: true
@@ -103,7 +103,7 @@ const routes = [
     },
     {
         path: '/purchase/receipt/show/:id',
-        name: 'receiptshow',
+        name: 'prshow',
         component: () => import('../views/transaction/purchase/receipt/Show.vue'),
         meta: {
           requiresAuth: true

@@ -57,30 +57,83 @@
                 Pending
               </v-chip>
               <v-chip
+                v-if="item.status == 1"
+                class="ma-1"
+                color="orange"
+                text-color="white"
+              >
+                Receiving
+              </v-chip>
+              <v-chip
+                v-if="item.status == 2"
+                class="ma-1"
+                color="purple"
+                text-color="white"
+              >
+                Closed
+              </v-chip>
+              <v-chip
                 v-if="item.status == 3"
                 class="ma-1"
                 color="error"
               >
                 Void
               </v-chip>
+              <v-chip
+                v-if="item.status == 4"
+                class="ma-1"
+                color="green"
+                text-color="white"
+              >
+                Done
+              </v-chip>
             </div>
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <div class="d-flex justify-center">
-              <v-icon
-                v-if="item.status == 0"
-                small
-                class="mr-2"
-                @click="editItem(item)"
-              >
-                mdi-pencil
-              </v-icon>
-              <v-icon
-                small
-                @click="showItem(item)"
-              >
-                mdi-eye
-              </v-icon>
+              <v-tooltip left>
+                <template v-slot:activator="{ on, attrs}">
+                  <v-icon
+                    v-if="item.status == 0"
+                    small
+                    class="mr-2"
+                    @click="editItem(item)"
+                    v-bind="attrs" 
+                    v-on="on"
+                  >
+                    mdi-pencil
+                  </v-icon>
+              </template>
+                <span>Edit</span>
+              </v-tooltip>
+              <v-tooltip left>
+                <template v-slot:activator="{ on, attrs}">
+                  <v-icon
+                    v-if="item.status == 2"
+                    class="mr-2"
+                    small
+                    @click="genInvoice(item)"
+                    v-bind="attrs" 
+                    v-on="on"
+                  >
+                    mdi-file-move-outline
+                  </v-icon>
+                </template>
+                <span>Generate Invoice</span>
+              </v-tooltip>
+              <v-tooltip left>
+                <template v-slot:activator="{ on, attrs}">
+                  <v-icon
+                    small
+                    @click="showItem(item)"
+                    v-bind="attrs" 
+                    v-on="on"
+                  >
+                    mdi-eye
+                  </v-icon>
+                </template>
+                <span>Preview</span>
+              </v-tooltip>
             </div>
           </template>
           </v-data-table>
@@ -123,7 +176,6 @@ export default {
     let page = this.$route.params.page;
     if(page != undefined){
       this.page = parseInt(page);
-      console.log(this.page);
     }
   },
   created(){
@@ -139,7 +191,7 @@ export default {
       const hours = dates.getHours().toString();
       const minutes = dates.getMinutes().toString();
       const seconds = dates.getSeconds().toString();
-      let time = hours + ':' + minutes + ':' + seconds;
+      let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     showItem(item){

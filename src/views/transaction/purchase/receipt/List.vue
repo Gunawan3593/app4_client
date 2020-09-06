@@ -57,7 +57,15 @@
                 Pending
               </v-chip>
               <v-chip
-                v-if="item.status == 3"
+                v-if="item.status == 1"
+                class="ma-1"
+                color="green"
+                text-color="white"
+              >
+                Done
+              </v-chip>
+              <v-chip
+                v-if="item.status == 2"
                 class="ma-1"
                 color="error"
               >
@@ -123,7 +131,6 @@ export default {
     let page = this.$route.params.page;
     if(page != undefined){
       this.page = parseInt(page);
-      console.log(this.page);
     }
   },
   created(){
@@ -132,18 +139,18 @@ export default {
   methods: {
     ...mapActions(['getPurchaseReceipt']),
     editItem(item) {
-      this.$router.push({ path: '/purchase/order/edit/'+item._id, query: { page: this.page }});
+      this.$router.push({ path: '/purchase/receipt/edit/'+item._id, query: { page: this.page }});
     },
     getDateTime(date){
       const dates = new Date(date);
       const hours = dates.getHours().toString();
       const minutes = dates.getMinutes().toString();
       const seconds = dates.getSeconds().toString();
-      let time = hours + ':' + minutes + ':' + seconds;
+      let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     showItem(item){
-      this.$router.push({ path: '/purchase/order/show/'+item._id, query: { page: this.page }});
+      this.$router.push({ path: '/purchase/receipt/show/'+item._id, query: { page: this.page }});
     }
   }
 }

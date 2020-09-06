@@ -129,10 +129,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="item in fields.items" :key="item.product">
+                    <tr v-for="(item,index) in fields.items" :key="item.product">
                       <td>{{ item.name }}</td>
                       <td>{{ item.order_qty }}</td>
-                      <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" /></td>
+                      <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" @change="checkQty(index)" /></td>
                       <td class="text-right">{{ item.cost | currency }}</td>
                       <td class="text-right">{{ item.qty * item.cost | currency }}</td>
                     </tr>
@@ -251,17 +251,19 @@ export default {
       const hours = new Date().getHours().toString();
       const minutes = new Date().getMinutes().toString();
       const seconds = new Date().getSeconds().toString();
-      let time = hours + ':' + minutes + ':' + seconds;
+      let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     async loadData(id) {
       let res = await this.getPurchaseReceipt(id);
       if(res == undefined){
-        return this.$router.push({ name: 'polist' });
+        return this.$router.push({ name: 'prlist' });
       }
       let rspn = res.data.data;
       this.fields.id = id;
       this.fields.no = rspn.no;
+      this.orders.push(rspn.order);
+      this.fields.order = rspn.order._id;
       this.fields.notes = rspn.notes;
       this.fields.user = this.user._id;
       this.fields.supplier = rspn.supplier._id;
@@ -311,7 +313,7 @@ export default {
     },
     getItem(id){
       let data = {
-        order: id
+        receipt: id
       }
       this.getPrItem(data).then(res => {
           if(res.data.success) {
@@ -320,8 +322,10 @@ export default {
               items.forEach(item => {
                 item = {
                   name: item.product.name,
+                  order_item: item.order_item._id,
                   product: item.product._id,
                   cost: item.cost,
+                  order_qty: item.qty + (item.order_item.qty - item.order_item.rcv_qty),
                   qty: item.qty
                 }
                 this.fields.items.push(item);
@@ -338,21 +342,29 @@ export default {
               let items = res.data.data;
               this.fields.items = [];
               items.forEach(item => {
-                item = {
-                  name: item.product.name,
-                  order_item: item._id,
-                  product: item.product._id,
-                  cost: item.cost,
-                  order_qty: item.qty,
-                  qty: item.qty
+                if (item.qty - item.rcv_qty > 0) {
+                  item = {
+                    name: item.product.name,
+                    order_item: item._id,
+                    product: item.product._id,
+                    cost: item.cost,
+                    order_qty: item.qty - item.rcv_qty,
+                    qty: item.qty - item.rcv_qty
+                  }
+                  this.fields.items.push(item);
                 }
-                this.fields.items.push(item);
               });
           }
       });
     },
     Back(){
         this.$router.push({ name: 'prlist', params: { page : this.page }});
+    },
+    checkQty(index){
+      let data = this.fields.items[index];
+      if (data.qty > data.order_qty) {
+        data.qty = data.order_qty;
+      }
     },
     submit () {
       this.fields.transdate = this.getDateTime(this.date);
