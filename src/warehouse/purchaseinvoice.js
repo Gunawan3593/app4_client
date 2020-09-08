@@ -53,11 +53,7 @@ const actions = {
         }
         try {
             commit('purchaseInvoice_request');
-<<<<<<< HEAD
             let res = await axios.get(publicPath+'/api/purchase/invoices/returnable'+data);
-=======
-            let res = await axios.get('http://localhost:5000/api/purchase/invoices/returnable'+data);
->>>>>>> cc9bf936599164ddfe3a3f7e8458268958b4fbdc
             if (res.data.success) {
                 commit('purchaseInvoice_success', res);
             }else{
