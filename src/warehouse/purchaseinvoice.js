@@ -44,15 +44,15 @@ const actions = {
             commit('purchaseInvoice_Api_error',err);
         }
     },
-    // Get Data Order Receivable by supplier
-    async getPOReceivable({ commit },id){
+    // Get Data Invoice Returnable by supplier
+    async getInvoiceReturnable({ commit },id){
         let data = '';
         if(id != undefined) {
             data = '/'+id;
         }
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.get('http://localhost:5000/api/purchase/invoices/receivable'+data);
+            let res = await axios.get('http://localhost:5000/api/purchase/invoices/returnable'+data);
             if (res.data.success) {
                 commit('purchaseInvoice_success', res);
             }else{

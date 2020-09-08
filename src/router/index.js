@@ -126,6 +126,38 @@ const routes = [
         }
     },
     {
+      path: '/purchase/return/list',
+      name: 'rtlist',
+      component: () => import('../views/transaction/purchase/return/List.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/purchase/return/edit/:id',
+        name: 'rtedit',
+        component: () => import('../views/transaction/purchase/return/Form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/purchase/return/add',
+      name: 'rtnew',
+      component: () => import('../views/transaction/purchase/return/Form.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/purchase/return/show/:id',
+        name: 'rtshow',
+        component: () => import('../views/transaction/purchase/return/Show.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
         path: '/login',
         name: 'login',
         component: () => import('../views/Login.vue'),

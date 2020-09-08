@@ -75,20 +75,34 @@
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <div class="d-flex justify-center">
-              <v-icon
-                v-if="item.status == 0"
-                small
-                class="mr-2"
-                @click="editItem(item)"
-              >
-                mdi-pencil
-              </v-icon>
-              <v-icon
-                small
-                @click="showItem(item)"
-              >
-                mdi-eye
-              </v-icon>
+              <v-tooltip left>
+                <template v-slot:activator="{ on, attrs}">
+                  <v-icon
+                    v-if="item.status == 0"
+                    small
+                    class="mr-2"
+                    @click="editItem(item)"
+                    v-bind="attrs" 
+                    v-on="on"
+                  >
+                    mdi-pencil
+                  </v-icon>
+                </template>
+                <span>Edit</span>
+              </v-tooltip>
+              <v-tooltip left>
+                <template v-slot:activator="{ on, attrs}">
+                  <v-icon
+                    small
+                    @click="showItem(item)"
+                    v-bind="attrs" 
+                    v-on="on"
+                  >
+                    mdi-eye
+                  </v-icon>
+                </template>
+                <span>Preview</span>
+              </v-tooltip>
             </div>
           </template>
           </v-data-table>
