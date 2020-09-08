@@ -1,5 +1,6 @@
 import axios from 'axios';
 import base from '../warehouse/base';
+import { publicPath } from '../../vue.config';
 
 const state = {
     status : ''
@@ -14,7 +15,7 @@ const actions = {
     async getSupplier({ commit }){
         try {
             commit('supplier_request');
-            let res = await axios.get('http://localhost:5000/api/suppliers');
+            let res = await axios.get(publicPath+'/api/suppliers');
             if (res.data.success) {
                 commit('supplier_success', res);
             }
@@ -27,7 +28,7 @@ const actions = {
     async addSupplier({ commit }, data) {
         try {
             commit('supplier_request');
-            let res = await axios.post('http://localhost:5000/api/suppliers/add', data);
+            let res = await axios.post(publicPath+'/api/suppliers/add', data);
             if (res.data.success !== undefined) {
                 commit('supplier_success', res);
             }
@@ -40,7 +41,7 @@ const actions = {
     async updateSupplier({ commit }, data) {
         try {
             commit('supplier_request');
-            let res = await axios.post('http://localhost:5000/api/suppliers/update', data);
+            let res = await axios.post(publicPath+'/api/suppliers/update', data);
             if (res.data.success !== undefined) {
                 commit('supplier_success', res);
             }
@@ -53,7 +54,7 @@ const actions = {
     async deleteSupplier({ commit }, data) {
         try {
             commit('supplier_request');
-            let res = await axios.post('http://localhost:5000/api/suppliers/delete', data);
+            let res = await axios.post(publicPath+'/api/suppliers/delete', data);
             if (res.data.success !== undefined) {
                 commit('supplier_success', res);
             }

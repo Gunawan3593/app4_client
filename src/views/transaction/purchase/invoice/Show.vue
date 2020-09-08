@@ -6,7 +6,7 @@
         >
             <v-card-text>
                 <v-row>
-                    <h2 class="ma-1">Purchase Order Detail</h2>
+                    <h2 class="ma-1">Purchase Invoice Detail</h2>
                     <v-spacer></v-spacer>
                     <v-btn class="ma-1" v-if="status == 0" @click="closeData()" small color="success">Close</v-btn>
                     <v-btn class="ma-1" v-if="status == 1" @click="openData()" small color="orange" dark>Open</v-btn>
@@ -124,18 +124,20 @@
                         <thead>
                             <tr>
                                 <th></th>
-                                <th colspan="3" class="text-center">Qty</th>
+                                <th colspan="4" class="text-center">Qty</th>
                                 <th></th>
-                                <th colspan="2" class="text-center">Total</th>
+                                <th colspan="3" class="text-center">Total</th>
                             </tr>
                             <tr>
                             <th class="text-center">Name</th>
                             <th class="text-center" width="50px">Order</th>
                             <th class="text-center" width="50px">Receipt</th>
                             <th class="text-center" width="50px">Invoice</th>
-                            <th class="text-center" width="200px">Cost</th>
-                            <th class="text-center" width="200px">Order</th>
-                            <th class="text-center" width="200px">Invoice</th>
+                            <th class="text-center" width="50px">Return</th>
+                            <th class="text-center" width="150px">Cost</th>
+                            <th class="text-center" width="150px">Order</th>
+                            <th class="text-center" width="150px">Invoice</th>
+                            <th class="text-center" width="150px">Return</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -143,15 +145,18 @@
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.order_qty }}</td>
                                 <td>{{ item.rcv_qty }}</td>
-                                <td>{{ item.rcv_qty }}</td>
+                                <td>{{ item.qty }}</td>
+                                <td>{{ item.return_qty }}</td>
                                 <td>{{ item.cost | currency }}</td>
+                                <td>{{ item.order_qty * item.cost | currency }}</td>
                                 <td>{{ item.qty * item.cost | currency }}</td>
-                                <td>{{ item.rcv_qty * item.cost | currency }}</td>
+                                <td>{{ item.return_qty * item.cost | currency }}</td>
                             </tr>
                             <tr>
-                                <td class="text-center" colspan="5">Total</td>
+                                <td class="text-center" colspan="6">Total</td>
                                 <td>{{ getSubtotal | currency }}</td>
                                 <td>{{ getTotalInvoice | currency }}</td>
+                                <td>{{ getTotalReturn | currency }}</td>
                             </tr>
                         </tbody>
                     </template>
@@ -202,7 +207,8 @@ export default {
                         cost: item.cost,
                         qty: item.qty,
                         rcv_qty: item.rcv_qty,
-                        order_qty: item.order_qty
+                        order_qty: item.order_qty,
+                        return_qty : item.return_qty
                     }
                     this.items.push(item);
                     });
@@ -268,7 +274,7 @@ export default {
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].qty * items[i].cost;
+                total += items[i].order_qty * items[i].cost;
             }
             return total;
         },
@@ -278,6 +284,15 @@ export default {
             let total = 0;
             for(var i=0;i<items.length;i++){
                 total += items[i].qty * items[i].cost;
+            }
+            return total;
+        },
+        getTotalReturn() {
+            let items = this.items;
+            if (items.length == 0) return;
+            let total = 0;
+            for(var i=0;i<items.length;i++){
+                total += items[i].return_qty * items[i].cost;
             }
             return total;
         }
