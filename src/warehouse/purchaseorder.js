@@ -1,6 +1,6 @@
 import axios from 'axios';
 import base from '../warehouse/base';
-import { publicPath } from '../../vue.config';
+const apiPath = process.env.VUE_APP_API_PATH;
 
 const state = {
     status : ''
@@ -15,7 +15,7 @@ const actions = {
     async getPoNo({ commit }){
         try {
             commit('purchaseOrder_request');
-            let res = await axios.get(publicPath+'/api/purchase/orders/getcode');
+            let res = await axios.get(apiPath+'/api/purchase/orders/getcode');
             if (res.data.success) {
                 commit('purchaseOrder_success', res);
             }else{
@@ -34,7 +34,7 @@ const actions = {
         }
         try {
             commit('purchaseOrder_request');
-            let res = await axios.get(publicPath+'/api/purchase/orders/data'+data);
+            let res = await axios.get(apiPath+'/api/purchase/orders/data'+data);
             if (res.data.success) {
                 commit('purchaseOrder_success', res);
             }else{
@@ -53,7 +53,7 @@ const actions = {
         }
         try {
             commit('purchaseOrder_request');
-            let res = await axios.get(publicPath+'/api/purchase/orders/receivable'+data);
+            let res = await axios.get(apiPath+'/api/purchase/orders/receivable'+data);
             if (res.data.success) {
                 commit('purchaseOrder_success', res);
             }else{
@@ -68,7 +68,7 @@ const actions = {
     async getPoItem ({ commit }, data) {
         try {
             commit('purchaseOrder_request');
-            let res = await axios.post(publicPath+'/api/purchase/orders/item', data);
+            let res = await axios.post(apiPath+'/api/purchase/orders/item', data);
             if (res.data.success !== undefined) {
                 commit('purchaseOrder_success', res);
             }else{
@@ -83,7 +83,7 @@ const actions = {
     async addPurchaseOrder({ commit }, data) {
         try {
             commit('purchaseOrder_request');
-            let res = await axios.post(publicPath+'/api/purchase/orders/add', data);
+            let res = await axios.post(apiPath+'/api/purchase/orders/add', data);
             if (res.data.success !== undefined) {
                 commit('purchaseOrder_success', res);
             }else{
@@ -98,7 +98,7 @@ const actions = {
     async updatePurchaseOrder({ commit }, data) {
         try {
             commit('purchaseOrder_request');
-            let res = await axios.post(publicPath+'/api/purchase/orders/update', data);
+            let res = await axios.post(apiPath+'/api/purchase/orders/update', data);
             if (res.data.success !== undefined) {
                 commit('purchaseOrder_success', res);
             }else{
@@ -113,7 +113,7 @@ const actions = {
     async voidPurchaseOrder({ commit }, data) {
         try {
             commit('purchaseOrder_request');
-            let res = await axios.post(publicPath+'/api/purchase/orders/void', data);
+            let res = await axios.post(apiPath+'/api/purchase/orders/void', data);
             if (res.data.success !== undefined) {
                 commit('purchaseOrder_success', res);
             }else{
@@ -128,7 +128,7 @@ const actions = {
     async closePurchaseOrder({ commit }, data) {
         try {
             commit('purchaseOrder_request');
-            let res = await axios.post(publicPath+'/api/purchase/orders/close', data);
+            let res = await axios.post(apiPath+'/api/purchase/orders/close', data);
             if (res.data.success !== undefined) {
                 commit('purchaseOrder_success', res);
             }else{
@@ -143,7 +143,7 @@ const actions = {
     async openPurchaseOrder({ commit }, data) {
         try {
             commit('purchaseOrder_request');
-            let res = await axios.post(publicPath+'/api/purchase/orders/open', data);
+            let res = await axios.post(apiPath+'/api/purchase/orders/open', data);
             if (res.data.success !== undefined) {
                 commit('purchaseOrder_success', res);
             }else{

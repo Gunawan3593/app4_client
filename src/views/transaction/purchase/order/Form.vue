@@ -95,7 +95,6 @@
               <v-autocomplete
                   v-model="productSelected"
                   :items="productItems"
-                  :search-input.sync="searchProduct"
                   hide-no-data
                   hide-selected
                   item-text="Description"
@@ -216,39 +215,20 @@ export default {
       products: [],
       isLoading: false,
       menu: false,
-      searchProduct: '',
       productSelected: '',
       page: ''
     }
-  },
-  watch: {
-    searchProduct() {
-        // Items have already been loaded
-        if (this.products.length > 0) return;
-
-        // Items have already been requested
-        if (this.isLoading) return;
-
-        this.isLoading = true;
-
-        // Lazily load input items
-        fetch('http://localhost:5000/api/products')
-          .then(res => res.json())
-          .then(res => {
-            const products  = res.data;
-            this.products = products;
-          })
-          .catch(err => {
-            console.log(err)
-          })
-          .finally(() => (this.isLoading = false))
-    },
   },
   async mounted(){
     let res = await this.getSupplier();
     let data = res.data.data;
     if(data) {
       this.suppliers = data;
+    }
+    res = await this.getProduct();
+    data = res.data.data;
+    if(data) {
+      this.products = data;
     }
     let id = this.$route.params.id;
     if (id != undefined) {
@@ -262,7 +242,7 @@ export default {
     this.page = page;
   },
   methods: {
-    ...mapActions(['getPoNo','getSupplier','addPurchaseOrder','getPoItem','updatePurchaseOrder','getPurchaseOrder']),
+    ...mapActions(['getPoNo','getSupplier','getProduct','addPurchaseOrder','getPoItem','updatePurchaseOrder','getPurchaseOrder']),
     getDateTime(date){
       const dates = new Date(date);
       const hours = new Date().getHours().toString();
