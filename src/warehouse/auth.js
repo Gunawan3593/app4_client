@@ -1,7 +1,7 @@
 import axios from 'axios';
 import router from '../router';
 import base from '../warehouse/base';
-import { publicPath } from '../../vue.config';
+const apiPath = process.env.VUE_APP_API_PATH;
 
 const state = {
     token: localStorage.getItem('token') || '',
@@ -26,7 +26,7 @@ const actions = {
     }, user) {
         try{
             commit('auth_request');
-            let res = await axios.post(publicPath+'/api/users/login', user);
+            let res = await axios.post(apiPath+'/api/users/login', user);
             if (res.data.success) {
                 const token = res.data.token;
                 const user = res.data.user;
@@ -47,7 +47,7 @@ const actions = {
     }, userData) {
         try{
             commit('register_request');
-            let res = await axios.post(publicPath+'/api/users/register', userData);
+            let res = await axios.post(apiPath+'/api/users/register', userData);
             if(res.data.success !== undefined) {
                 commit('register_success',res);
             }
@@ -59,7 +59,7 @@ const actions = {
     // Get the user profile
     async getProfile({ commit }){
         commit('profile_request');
-        let res = await axios.get(publicPath+'/api/users/profile');
+        let res = await axios.get(apiPath+'/api/users/profile');
         commit('user_profile', res.data.user);
         return res;
     },
@@ -74,21 +74,21 @@ const actions = {
     // check username
     async checkUsername({ commit }, username) {
         // Check for the unique Username
-        let res = await axios.post(publicPath+'/api/users/checkuser', username);
+        let res = await axios.post(apiPath+'/api/users/checkuser', username);
         commit('user_exists',res.data);
         return res;
     },
     // check email
     async checkUseremail({ commit }, email) {
         // Check for the unique Username
-        let res = await axios.post(publicPath+'/api/users/checkemail', email);
+        let res = await axios.post(apiPath+'/api/users/checkemail', email);
         commit('email_exists',res.data);
         return res;
     },
     // check email
     async checkUpdemail({ commit }, email) {
         // Check for the unique Username
-        let res = await axios.post(publicPath+'/api/users/checkupdemail', email);
+        let res = await axios.post(apiPath+'/api/users/checkupdemail', email);
         commit('email_exists',res.data);
         return res;
     },
@@ -98,7 +98,7 @@ const actions = {
     }, userData) {
         try{
             commit('update_request');
-            let res = await axios.post(publicPath+'/api/users/updateuser', userData);
+            let res = await axios.post(apiPath+'/api/users/updateuser', userData);
             if(res.data.success !== undefined) {
                 commit('update_success',res);
             }

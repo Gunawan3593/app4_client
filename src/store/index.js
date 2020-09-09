@@ -10,6 +10,11 @@ import purchaseorder from '../warehouse/purchaseorder';
 import purchasereceipt from '../warehouse/purchasereceipt';
 import purchaseinvoice from '../warehouse/purchaseinvoice';
 import purchasereturn from '../warehouse/purchasereturn';
+import salesorder from '../warehouse/salesorder';
+import salesdelivery from '../warehouse/salesdelivery';
+import inventory from '../warehouse/inventory';
+import salesinvoice from '../warehouse/salesinvoice';
+import salesreturn from '../warehouse/salesreturn';
 
 vue.use(vuex);
 
@@ -30,7 +35,12 @@ export default new vuex.Store({
     purchaseorder,
     purchasereceipt,
     purchaseinvoice,
-    purchasereturn
+    purchasereturn,
+    salesorder,
+    salesdelivery,
+    inventory,
+    salesinvoice,
+    salesreturn
   }
 });
 

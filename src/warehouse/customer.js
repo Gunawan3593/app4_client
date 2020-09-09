@@ -1,6 +1,6 @@
 import axios from 'axios';
 import base from '../warehouse/base';
-import { publicPath } from '../../vue.config';
+const apiPath = process.env.VUE_APP_API_PATH;
 
 const state = {
     status : ''
@@ -15,7 +15,7 @@ const actions = {
     async getCustomer({ commit }){
         try {
             commit('customer_request');
-            let res = await axios.get(publicPath+'/api/customers');
+            let res = await axios.get(apiPath+'/api/customers');
             if (res.data.success) {
                 commit('customer_success', res);
             }
@@ -28,7 +28,7 @@ const actions = {
     async addCustomer({ commit }, data) {
         try {
             commit('customer_request');
-            let res = await axios.post(publicPath+'/api/customers/add', data);
+            let res = await axios.post(apiPath+'/api/customers/add', data);
             if (res.data.success !== undefined) {
                 commit('customer_success', res);
             }
@@ -41,7 +41,7 @@ const actions = {
     async updateCustomer({ commit }, data) {
         try {
             commit('customer_request');
-            let res = await axios.post(publicPath+'/api/customers/update', data);
+            let res = await axios.post(apiPath+'/api/customers/update', data);
             if (res.data.success !== undefined) {
                 commit('customer_success', res);
             }
@@ -54,7 +54,7 @@ const actions = {
     async deleteCustomer({ commit }, data) {
         try {
             commit('customer_request');
-            let res = await axios.post(publicPath+'/api/customers/delete', data);
+            let res = await axios.post(apiPath+'/api/customers/delete', data);
             if (res.data.success !== undefined) {
                 commit('customer_success', res);
             }

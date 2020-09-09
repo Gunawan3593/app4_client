@@ -1,6 +1,6 @@
 import axios from 'axios';
 import base from '../warehouse/base';
-import { publicPath } from '../../vue.config';
+const apiPath = process.env.VUE_APP_API_PATH;
 
 const state = {
     status : ''
@@ -15,7 +15,7 @@ const actions = {
     async getProduct({ commit }){
         try {
             commit('product_request');
-            let res = await axios.get(publicPath+'/api/products');
+            let res = await axios.get(apiPath+'/api/products');
             if (res.data.success) {
                 commit('product_success', res);
             }
@@ -28,7 +28,7 @@ const actions = {
     async addProduct({ commit }, data) {
         try {
             commit('product_request');
-            let res = await axios.post(publicPath+'/api/products/add', data);
+            let res = await axios.post(apiPath+'/api/products/add', data);
             if (res.data.success !== undefined) {
                 commit('product_success', res);
             }
@@ -41,7 +41,7 @@ const actions = {
     async updateProduct({ commit }, data) {
         try {
             commit('product_request');
-            let res = await axios.post(publicPath+'/api/products/update', data);
+            let res = await axios.post(apiPath+'/api/products/update', data);
             if (res.data.success !== undefined) {
                 commit('product_success', res);
             }
@@ -54,7 +54,7 @@ const actions = {
     async deleteProduct({ commit }, data) {
         try {
             commit('product_request');
-            let res = await axios.post(publicPath+'/api/products/delete', data);
+            let res = await axios.post(apiPath+'/api/products/delete', data);
             if (res.data.success !== undefined) {
                 commit('product_success', res);
             }

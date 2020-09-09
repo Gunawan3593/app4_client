@@ -1,6 +1,6 @@
 import axios from 'axios';
 import base from '../warehouse/base';
-import { publicPath } from '../../vue.config';
+const apiPath = process.env.VUE_APP_API_PATH;
 
 const state = {
     status : ''
@@ -15,7 +15,7 @@ const actions = {
     async getRtNo({ commit }){
         try {
             commit('purchaseReturn_request');
-            let res = await axios.get(publicPath+'/api/purchase/returns/getcode');
+            let res = await axios.get(apiPath+'/api/purchase/returns/getcode');
             if (res.data.success) {
                 commit('purchaseReturn_success', res);
             }else{
@@ -34,7 +34,7 @@ const actions = {
         }
         try {
             commit('purchaseReturn_request');
-            let res = await axios.get(publicPath+'/api/purchase/returns/data'+data);
+            let res = await axios.get(apiPath+'/api/purchase/returns/data'+data);
             if (res.data.success) {
                 commit('purchaseReturn_success', res);
             }else{
@@ -49,7 +49,7 @@ const actions = {
     async getRtItem ({ commit }, data) {
         try {
             commit('purchaseReturn_request');
-            let res = await axios.post(publicPath+'/api/purchase/returns/item', data);
+            let res = await axios.post(apiPath+'/api/purchase/returns/item', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReturn_success', res);
             }else{
@@ -64,7 +64,7 @@ const actions = {
     async addPurchaseReturn({ commit }, data) {
         try {
             commit('purchaseReturn_request');
-            let res = await axios.post(publicPath+'/api/purchase/returns/add', data);
+            let res = await axios.post(apiPath+'/api/purchase/returns/add', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReturn_success', res);
             }else{
@@ -79,7 +79,7 @@ const actions = {
     async updatePurchaseReturn({ commit }, data) {
         try {
             commit('purchaseReturn_request');
-            let res = await axios.post(publicPath+'/api/purchase/returns/update', data);
+            let res = await axios.post(apiPath+'/api/purchase/returns/update', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReturn_success', res);
             }else{
@@ -94,7 +94,7 @@ const actions = {
     async voidPurchaseReturn({ commit }, data) {
         try {
             commit('purchaseReturn_request');
-            let res = await axios.post(publicPath+'/api/purchase/returns/void', data);
+            let res = await axios.post(apiPath+'/api/purchase/returns/void', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReturn_success', res);
             }else{
@@ -109,7 +109,7 @@ const actions = {
     async closePurchaseReturn({ commit }, data) {
         try {
             commit('purchaseReturn_request');
-            let res = await axios.post(publicPath+'/api/purchase/returns/close', data);
+            let res = await axios.post(apiPath+'/api/purchase/returns/close', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReturn_success', res);
             }else{
@@ -124,7 +124,7 @@ const actions = {
     async openPurchaseReturn({ commit }, data) {
         try {
             commit('purchaseReturn_request');
-            let res = await axios.post(publicPath+'/api/purchase/returns/open', data);
+            let res = await axios.post(apiPath+'/api/purchase/returns/open', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReturn_success', res);
             }else{

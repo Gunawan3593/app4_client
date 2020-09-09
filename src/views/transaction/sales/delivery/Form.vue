@@ -14,7 +14,7 @@
           dark
           flat
         >
-          <v-toolbar-title>Add Purchase Order</v-toolbar-title>
+          <v-toolbar-title>Add Sales Delivery</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-title>
               <v-tooltip left>
@@ -25,7 +25,7 @@
               </v-tooltip>
               <v-tooltip left>
               <template v-slot:activator="{ on, attrs}">
-                <v-btn icon color="dee-orange" link to="/purchase/order/add"  v-bind="attrs" v-on="on"><v-icon>mdi-restore</v-icon></v-btn>
+                <v-btn icon color="dee-orange" link to="/purchase/delivery/add"  v-bind="attrs" v-on="on"><v-icon>mdi-restore</v-icon></v-btn>
               </template>
               <span>New Data</span>
               </v-tooltip>
@@ -72,20 +72,21 @@
               </v-col>
               <v-col cols="12" sm="12" md="4">
                 <v-autocomplete
-                    v-model="fields.supplier"
-                    :error-messages="supplierErrors"
+                    v-model="fields.customer"
+                    :error-messages="customerErrors"
                     required
-                    :items="supplierItems"
+                    :items="customerItems"
                     hide-no-data
                     hide-selected
                     item-text="Description"
                     item-value="_id"
-                    label="Supplier"
+                    label="Customer"
                     placeholder="Start typing to Search"
                     prepend-icon="mdi-dresser"
                     :return-object="false"
-                    @input="$v.fields.supplier.$touch()"
-                    @blur="$v.fields.supplier.$touch()"
+                    @change="loadOrder($event)"
+                    @input="$v.fields.customer.$touch()"
+                    @blur="$v.fields.customer.$touch()"
                 ></v-autocomplete>
               </v-col>
             </v-row>
@@ -93,16 +94,21 @@
           <v-row>
             <v-col cols="12" sm="6" md="4">
               <v-autocomplete
-                  v-model="productSelected"
-                  :items="productItems"
-                  hide-no-data
-                  hide-selected
-                  item-text="Description"
-                  label="Product"
-                  placeholder="Select Product"
-                  prepend-icon="mdi-database-search"
-                  return-object
-                  @change="addItem()"
+                    v-model="fields.order"
+                    :error-messages="orderErrors"
+                    required
+                    :items="orderItems"
+                    hide-no-data
+                    hide-selected
+                    item-text="Description"
+                    item-value="_id"
+                    label="Order"
+                    placeholder="Start typing to Search"
+                    prepend-icon="mdi-cart-outline"
+                    :return-object="false"
+                    @change="getOrderItem($event)"
+                    @input="$v.fields.order.$touch()"
+                    @blur="$v.fields.order.$touch()"
                 ></v-autocomplete>
             </v-col>
             <v-col cols="12" sm="6" md="8">
@@ -116,25 +122,30 @@
                   <thead>
                     <tr>
                       <th class="text-center">Name</th>
+                      <th class="text-center" width="100px">Order</th>
+                      <th class="text-center" width="100px">Stock</th>
                       <th class="text-center" width="100px">Qty</th>
                       <th class="text-center" width="200px;">Cost</th>
                       <th class="text-center" width="200px;">Total</th>
-                      <th class="text-center" width="50px;">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="item in fields.items" :key="item.product">
-                        <td>{{ item.name }}</td>
-                        <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" /></td>
-                        <td class="text-right">{{ item.cost | currency }}</td>
-                        <td class="text-right">{{ item.qty * item.cost | currency }}</td>
-                        <td><v-icon
-                              small
-                              @click="deleteItem(item)"
-                            >
-                              mdi-delete
-                            </v-icon>
-                        </td>
+                    <tr v-for="(item,index) in fields.items" :key="item.product">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.order_qty }}</td>
+                      <td>{{ item.stock }} 
+                          <v-tooltip left color="error">
+                            <template v-slot:activator="{ on, attrs}">
+                              <v-icon color="error" v-if="item.stock < item.qty" 
+                                v-bind="attrs" 
+                                v-on="on"
+                              >mdi-alert-circle</v-icon>
+                            </template>
+                            <span>Warning : Stock is not enough !<br> If you still save the delivery, <br> Stock will have minus value</span>
+                          </v-tooltip>
+                      <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" @change="checkQty(index)" /></td>
+                      <td class="text-right">{{ item.cost | currency }}</td>
+                      <td class="text-right">{{ item.qty * item.cost | currency }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -166,27 +177,34 @@ export default {
   mixins: [validationMixin],
   validations: {
     fields: {
-      supplier: { required }
+      customer: { required },
+      order: { required }
     }
   },
   computed: {
     ...mapGetters(['user','purchaseOrderStatus']),
-    supplierErrors () {
+    customerErrors () {
       const errors = []
-      if (!this.$v.fields.supplier.$dirty) return errors
-      !this.$v.fields.supplier.required && errors.push('Supplier is required.')
+      if (!this.$v.fields.customer.$dirty) return errors
+      !this.$v.fields.customer.required && errors.push('Customer is required.')
       return errors
     },
-    supplierItems () {
-      return this.suppliers.map(supplier => {
-        const Description = supplier.name
-        return Object.assign({}, supplier, { Description })
+    orderErrors () {
+      const errors = []
+      if (!this.$v.fields.order.$dirty) return errors
+      !this.$v.fields.order.required && errors.push('Order is required.')
+      return errors
+    },
+    customerItems () {
+      return this.customers.map(customer => {
+        const Description = customer.name
+        return Object.assign({}, customer, { Description })
       })
     },
-    productItems () {
-      return this.products.map(product => {
-        const Description = product.name
-        return Object.assign({}, product, { Description })
+    orderItems () {
+      return this.orders.map(order => {
+        const Description = order.no
+        return Object.assign({}, order, { Description })
       })
     },
     getSubtotal() {
@@ -205,30 +223,26 @@ export default {
         id: false,
         no: '',
         transdate: '',
-        supplier: '',
+        order: '',
+        customer: '',
         notes: '',
         user: '',
         items : []
       },
       date : '',
-      suppliers: [],
+      customers: [],
+      orders: [],
       products: [],
       isLoading: false,
       menu: false,
-      productSelected: '',
       page: ''
     }
   },
   async mounted(){
-    let res = await this.getSupplier();
+    let res = await this.getCustomer();
     let data = res.data.data;
     if(data) {
-      this.suppliers = data;
-    }
-    res = await this.getProduct();
-    data = res.data.data;
-    if(data) {
-      this.products = data;
+      this.customers = data;
     }
     let id = this.$route.params.id;
     if (id != undefined) {
@@ -242,7 +256,7 @@ export default {
     this.page = page;
   },
   methods: {
-    ...mapActions(['getPoNo','getSupplier','getProduct','addPurchaseOrder','getPoItem','updatePurchaseOrder','getPurchaseOrder']),
+    ...mapActions(['getSdNo','getCustomer','addSalesDelivery','getSoItem','getSdItem','updateSalesDelivery','getSalesDelivery','getSoDelivable','checkStock']),
     getDateTime(date){
       const dates = new Date(date);
       const hours = new Date().getHours().toString();
@@ -252,91 +266,132 @@ export default {
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     async loadData(id) {
-      let res = await this.getPurchaseOrder(id);
+      let res = await this.getSalesDelivery(id);
       if(res == undefined){
-        return this.$router.push({ name: 'polist' });
+        return this.$router.push({ name: 'sdlist' });
       }
       let rspn = res.data.data;
       this.fields.id = id;
       this.fields.no = rspn.no;
+      this.orders.push(rspn.order);
+      this.fields.order = rspn.order._id;
       this.fields.notes = rspn.notes;
       this.fields.user = this.user._id;
-      this.fields.supplier = rspn.supplier._id;
-      this.getItem(id);
+      this.fields.customer = rspn.customer._id;
       this.fields.transdate = rspn.transdate;
       this.date = rspn.transdate.slice(0,10);
+      this.getItem(id);
+    },
+    async loadOrder(id){
+      let res = await this.getSoDelivable(id);
+      let data = res.data.data;
+      this.orders = [];
+      this.fields.items = [];
+      if(data != undefined){
+        data.forEach(order => {
+          this.orders.push(order);
+        });
+      }
     },
     addData() {
         this.isloading = true;
-        this.addPurchaseOrder(this.fields).then(res => {
+        this.addSalesDelivery(this.fields).then(res => {
             if(res.data.success) {
                 this.isloading = false;
-                this.$router.push('/purchase/order/list');
+                this.$router.push('/sales/delivery/list');
             }
         })
     },
     updateData() {
         this.isloading = true;
-        this.updatePurchaseOrder(this.fields).then(res => {
+        this.updateSalesDelivery(this.fields).then(res => {
             if(res.data.success) {
                 this.isloading = false;
-                this.$router.push({ name : 'polist', params: { page : this.page }});
+                this.$router.push({ name : 'sdlist', params: { page : this.page }});
             }
         })
     },
     async reset(){
-      let data = await this.getPoNo();
+      let data = await this.getSdNo();
       this.fields.id = false;
       this.fields.no = data.data.code;
       this.date = new Date().toISOString().slice(0,10);
-      this.fields.supplier = '';
+      this.fields.customer = '';
       this.fields.notes = '';
       this.fields.items = [];
       this.fields.user = this.user._id;
       this.fields.transdate = new Date();
     },
-    getItem(id){
-        let data = {
-          order: id
-        }
-        this.getPoItem(data).then(res => {
-            if(res.data.success) {
-                let items = res.data.data;
-                this.fields.items = [];
-                items.forEach(item => {
+    async getItem(id){
+      let data = {
+        delivery: id
+      }
+      await this.getSdItem(data).then(res => {
+          if(res.data.success) {
+              let items = res.data.data;
+              this.fields.items = [];
+              items.forEach(item => {
+                item = {
+                  name: item.product.name,
+                  order_item: item.order_item._id,
+                  product: item.product._id,
+                  cost: item.cost,
+                  order_qty: item.qty + (item.order_item.qty - item.order_item.deliv_qty),
+                  qty: item.qty,
+                  stock: item.qty
+                }
+                this.fields.items.push(item);
+              });
+          }
+      });
+      let items = this.fields.items;
+      items.forEach(item => {
+        this.checkStock(item.product).then(res => {
+          let qty = res.data.qty;
+          item.stock += qty;
+        });
+      });
+    },
+    async getOrderItem(id){
+      let data = {
+        order: id
+      }
+      await this.getSoItem(data).then(res => {
+          if(res.data.success) {
+              let items = res.data.data;
+              this.fields.items = [];
+              items.forEach(item => {
+                if (item.qty - item.deliv_qty > 0) {
                   item = {
                     name: item.product.name,
+                    order_item: item._id,
                     product: item.product._id,
                     cost: item.cost,
-                    qty: item.qty
+                    order_qty: item.qty - item.deliv_qty,
+                    qty: item.qty - item.deliv_qty,
+                    stock: 0
                   }
                   this.fields.items.push(item);
-                });
-            }
+                }
+              });
+          }
+      });
+      let items = this.fields.items;
+      items.forEach(item => {
+        this.checkStock(item.product).then(res => {
+          let qty = res.data.qty;
+          item.stock = qty;
         });
-    },
-    addItem(){
-      let data = this.productSelected;
-      let index = this.fields.items.findIndex(item => item.product == data._id);
-      if(index >= 0) {
-        this.fields.items[index].qty += 1; 
-      }else{
-        let row = {
-          product: data._id,
-          name: data.name,
-          qty: 1,
-          cost: data.cost
-        }
-        this.fields.items.push(row);
-      }
-      this.productSelected = {};
-    },
-    deleteItem(item) {
-      let index = this.fields.items.findIndex(row => row.product === item.product);
-      this.fields.items.splice(index, 1);
+      });   
     },
     Back(){
-        this.$router.push({ name: 'polist', params: { page : this.page }});
+        this.$router.push({ name: 'sdlist', params: { page : this.page }});
+    },
+    checkQty(index){
+      let data = this.fields.items[index];
+      if (data.qty > data.order_qty) {
+        data.qty = data.order_qty;
+      }
     },
     submit () {
       this.fields.transdate = this.getDateTime(this.date);

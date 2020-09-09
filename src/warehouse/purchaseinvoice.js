@@ -1,13 +1,13 @@
 import axios from 'axios';
 import base from '../warehouse/base';
-import { publicPath } from '../../vue.config';
+const apiPath = process.env.VUE_APP_API_PATH;
 
 const state = {
     status : ''
 }
 
 const getters = {
-    purchaseIvoiceStatus: state => state.status
+    purchaseInvoiceStatus: state => state.status
 }
 
 const actions = {
@@ -15,7 +15,7 @@ const actions = {
     async genPurchaseInvoice({ commit }, data){
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.post(publicPath+'/api/purchase/invoices/generate', data);
+            let res = await axios.post(apiPath+'/api/purchase/invoices/generate', data);
             if (res.data.success) {
                 commit('purchaseInvoice_success', res);
             }else{
@@ -34,7 +34,7 @@ const actions = {
         }
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.get(publicPath+'/api/purchase/invoices/data'+data);
+            let res = await axios.get(apiPath+'/api/purchase/invoices/data'+data);
             if (res.data.success) {
                 commit('purchaseInvoice_success', res);
             }else{
@@ -53,7 +53,7 @@ const actions = {
         }
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.get(publicPath+'/api/purchase/invoices/returnable'+data);
+            let res = await axios.get(apiPath+'/api/purchase/invoices/returnable'+data);
             if (res.data.success) {
                 commit('purchaseInvoice_success', res);
             }else{
@@ -68,7 +68,7 @@ const actions = {
     async getPiItem ({ commit }, data) {
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.post(publicPath+'/api/purchase/invoices/item', data);
+            let res = await axios.post(apiPath+'/api/purchase/invoices/item', data);
             if (res.data.success !== undefined) {
                 commit('purchaseInvoice_success', res);
             }else{
@@ -83,7 +83,7 @@ const actions = {
     async addPurchaseInvoice({ commit }, data) {
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.post(publicPath+'/api/purchase/invoices/add', data);
+            let res = await axios.post(apiPath+'/api/purchase/invoices/add', data);
             if (res.data.success !== undefined) {
                 commit('purchaseInvoice_success', res);
             }else{
@@ -98,7 +98,7 @@ const actions = {
     async updatePurchaseInvoice({ commit }, data) {
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.post(publicPath+'/api/purchase/invoices/update', data);
+            let res = await axios.post(apiPath+'/api/purchase/invoices/update', data);
             if (res.data.success !== undefined) {
                 commit('purchaseInvoice_success', res);
             }else{
@@ -113,7 +113,7 @@ const actions = {
     async voidPurchaseInvoice({ commit }, data) {
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.post(publicPath+'/api/purchase/invoices/void', data);
+            let res = await axios.post(apiPath+'/api/purchase/invoices/void', data);
             if (res.data.success !== undefined) {
                 commit('purchaseInvoice_success', res);
             }else{
@@ -128,7 +128,7 @@ const actions = {
     async closePurchaseInvoice({ commit }, data) {
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.post(publicPath+'/api/purchase/invoices/close', data);
+            let res = await axios.post(apiPath+'/api/purchase/invoices/close', data);
             if (res.data.success !== undefined) {
                 commit('purchaseInvoice_success', res);
             }else{
@@ -143,7 +143,7 @@ const actions = {
     async openPurchaseInvoice({ commit }, data) {
         try {
             commit('purchaseInvoice_request');
-            let res = await axios.post(publicPath+'/api/purchase/invoices/open', data);
+            let res = await axios.post(apiPath+'/api/purchase/invoices/open', data);
             if (res.data.success !== undefined) {
                 commit('purchaseInvoice_success', res);
             }else{

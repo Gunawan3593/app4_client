@@ -1,6 +1,6 @@
 import axios from 'axios';
 import base from '../warehouse/base';
-import { publicPath } from '../../vue.config';
+const apiPath = process.env.VUE_APP_API_PATH;
 
 const state = {
     status : ''
@@ -15,7 +15,7 @@ const actions = {
     async getCategory({ commit }){
         try {
             commit('category_request');
-            let res = await axios.get(publicPath+'/api/categories');
+            let res = await axios.get(apiPath+'/api/categories');
             if (res.data.success) {
                 commit('category_success', res);
             }
@@ -28,7 +28,7 @@ const actions = {
     async addCategory({ commit }, data) {
         try {
             commit('category_request');
-            let res = await axios.post(publicPath+'/api/categories/add', data);
+            let res = await axios.post(apiPath+'/api/categories/add', data);
             if (res.data.success !== undefined) {
                 commit('category_success', res);
             }
@@ -41,7 +41,7 @@ const actions = {
     async updateCategory({ commit }, data) {
         try {
             commit('category_request');
-            let res = await axios.post(publicPath+'/api/categories/update', data);
+            let res = await axios.post(apiPath+'/api/categories/update', data);
             if (res.data.success !== undefined) {
                 commit('category_success', res);
             }
@@ -54,7 +54,7 @@ const actions = {
     async deleteCategory({ commit }, data) {
         try {
             commit('category_request');
-            let res = await axios.post(publicPath+'/api/categories/delete', data);
+            let res = await axios.post(apiPath+'/api/categories/delete', data);
             if (res.data.success !== undefined) {
                 commit('category_success', res);
             }

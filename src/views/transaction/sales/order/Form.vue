@@ -14,7 +14,7 @@
           dark
           flat
         >
-          <v-toolbar-title>Add Purchase Order</v-toolbar-title>
+          <v-toolbar-title>Add Sales Order</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-title>
               <v-tooltip left>
@@ -25,7 +25,7 @@
               </v-tooltip>
               <v-tooltip left>
               <template v-slot:activator="{ on, attrs}">
-                <v-btn icon color="dee-orange" link to="/purchase/order/add"  v-bind="attrs" v-on="on"><v-icon>mdi-restore</v-icon></v-btn>
+                <v-btn icon color="dee-orange" link to="/sales/order/add"  v-bind="attrs" v-on="on"><v-icon>mdi-restore</v-icon></v-btn>
               </template>
               <span>New Data</span>
               </v-tooltip>
@@ -72,20 +72,20 @@
               </v-col>
               <v-col cols="12" sm="12" md="4">
                 <v-autocomplete
-                    v-model="fields.supplier"
-                    :error-messages="supplierErrors"
+                    v-model="fields.customer"
+                    :error-messages="customerErrors"
                     required
-                    :items="supplierItems"
+                    :items="customerItems"
                     hide-no-data
                     hide-selected
                     item-text="Description"
                     item-value="_id"
-                    label="Supplier"
+                    label="Customers"
                     placeholder="Start typing to Search"
                     prepend-icon="mdi-dresser"
                     :return-object="false"
-                    @input="$v.fields.supplier.$touch()"
-                    @blur="$v.fields.supplier.$touch()"
+                    @input="$v.fields.customer.$touch()"
+                    @blur="$v.fields.customer.$touch()"
                 ></v-autocomplete>
               </v-col>
             </v-row>
@@ -166,21 +166,21 @@ export default {
   mixins: [validationMixin],
   validations: {
     fields: {
-      supplier: { required }
+      customer: { required }
     }
   },
   computed: {
-    ...mapGetters(['user','purchaseOrderStatus']),
-    supplierErrors () {
+    ...mapGetters(['user','salesOrderStatus']),
+    customerErrors () {
       const errors = []
-      if (!this.$v.fields.supplier.$dirty) return errors
-      !this.$v.fields.supplier.required && errors.push('Supplier is required.')
+      if (!this.$v.fields.customer.$dirty) return errors
+      !this.$v.fields.customer.required && errors.push('Customer is required.')
       return errors
     },
-    supplierItems () {
-      return this.suppliers.map(supplier => {
-        const Description = supplier.name
-        return Object.assign({}, supplier, { Description })
+    customerItems () {
+      return this.customers.map(customer => {
+        const Description = customer.name
+        return Object.assign({}, customer, { Description })
       })
     },
     productItems () {
@@ -205,13 +205,13 @@ export default {
         id: false,
         no: '',
         transdate: '',
-        supplier: '',
+        customer: '',
         notes: '',
         user: '',
         items : []
       },
       date : '',
-      suppliers: [],
+      customers: [],
       products: [],
       isLoading: false,
       menu: false,
@@ -220,10 +220,10 @@ export default {
     }
   },
   async mounted(){
-    let res = await this.getSupplier();
+    let res = await this.getCustomer();
     let data = res.data.data;
     if(data) {
-      this.suppliers = data;
+      this.customers = data;
     }
     res = await this.getProduct();
     data = res.data.data;
@@ -242,7 +242,7 @@ export default {
     this.page = page;
   },
   methods: {
-    ...mapActions(['getPoNo','getSupplier','getProduct','addPurchaseOrder','getPoItem','updatePurchaseOrder','getPurchaseOrder']),
+    ...mapActions(['getSoNo','getCustomer','getProduct','addSalesOrder','getSoItem','updateSalesOrder','getSalesOrder']),
     getDateTime(date){
       const dates = new Date(date);
       const hours = new Date().getHours().toString();
@@ -252,44 +252,44 @@ export default {
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     async loadData(id) {
-      let res = await this.getPurchaseOrder(id);
+      let res = await this.getSalesOrder(id);
       if(res == undefined){
-        return this.$router.push({ name: 'polist' });
+        return this.$router.push({ name: 'solist' });
       }
       let rspn = res.data.data;
       this.fields.id = id;
       this.fields.no = rspn.no;
       this.fields.notes = rspn.notes;
       this.fields.user = this.user._id;
-      this.fields.supplier = rspn.supplier._id;
+      this.fields.customer = rspn.customer._id;
       this.getItem(id);
       this.fields.transdate = rspn.transdate;
       this.date = rspn.transdate.slice(0,10);
     },
     addData() {
         this.isloading = true;
-        this.addPurchaseOrder(this.fields).then(res => {
+        this.addSalesOrder(this.fields).then(res => {
             if(res.data.success) {
                 this.isloading = false;
-                this.$router.push('/purchase/order/list');
+                this.$router.push('/sales/order/list');
             }
         })
     },
     updateData() {
         this.isloading = true;
-        this.updatePurchaseOrder(this.fields).then(res => {
+        this.updateSalesOrder(this.fields).then(res => {
             if(res.data.success) {
                 this.isloading = false;
-                this.$router.push({ name : 'polist', params: { page : this.page }});
+                this.$router.push({ name : 'solist', params: { page : this.page }});
             }
         })
     },
     async reset(){
-      let data = await this.getPoNo();
+      let data = await this.getSoNo();
       this.fields.id = false;
       this.fields.no = data.data.code;
       this.date = new Date().toISOString().slice(0,10);
-      this.fields.supplier = '';
+      this.fields.customer = '';
       this.fields.notes = '';
       this.fields.items = [];
       this.fields.user = this.user._id;
@@ -299,7 +299,7 @@ export default {
         let data = {
           order: id
         }
-        this.getPoItem(data).then(res => {
+        this.getSoItem(data).then(res => {
             if(res.data.success) {
                 let items = res.data.data;
                 this.fields.items = [];
@@ -336,7 +336,7 @@ export default {
       this.fields.items.splice(index, 1);
     },
     Back(){
-        this.$router.push({ name: 'polist', params: { page : this.page }});
+        this.$router.push({ name: 'solist', params: { page : this.page }});
     },
     submit () {
       this.fields.transdate = this.getDateTime(this.date);

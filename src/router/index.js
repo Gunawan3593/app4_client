@@ -158,6 +158,118 @@ const routes = [
         }
     },
     {
+      path: '/sales/order/list',
+      name: 'solist',
+      component: () => import('../views/transaction/sales/order/List.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/sales/order/edit/:id',
+        name: 'soedit',
+        component: () => import('../views/transaction/sales/order/Form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/sales/order/add',
+      name: 'sonew',
+      component: () => import('../views/transaction/sales/order/Form.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/sales/order/show/:id',
+        name: 'soshow',
+        component: () => import('../views/transaction/sales/order/Show.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/sales/delivery/list',
+      name: 'sdlist',
+      component: () => import('../views/transaction/sales/delivery/List.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/sales/delivery/edit/:id',
+        name: 'sdedit',
+        component: () => import('../views/transaction/sales/delivery/Form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/sales/delivery/add',
+      name: 'sdnew',
+      component: () => import('../views/transaction/sales/delivery/Form.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/sales/delivery/show/:id',
+        name: 'sdshow',
+        component: () => import('../views/transaction/sales/delivery/Show.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/sales/invoice/list',
+      name: 'silist',
+      component: () => import('../views/transaction/sales/invoice/List.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/sales/invoice/show/:id',
+        name: 'sishow',
+        component: () => import('../views/transaction/sales/invoice/Show.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/sales/return/list',
+      name: 'srlist',
+      component: () => import('../views/transaction/sales/return/List.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/sales/return/edit/:id',
+        name: 'sredit',
+        component: () => import('../views/transaction/sales/return/Form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
+      path: '/sales/return/add',
+      name: 'srnew',
+      component: () => import('../views/transaction/sales/return/Form.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+        path: '/sales/return/show/:id',
+        name: 'srshow',
+        component: () => import('../views/transaction/sales/return/Show.vue'),
+        meta: {
+          requiresAuth: true
+        }
+    },
+    {
         path: '/login',
         name: 'login',
         component: () => import('../views/Login.vue'),
