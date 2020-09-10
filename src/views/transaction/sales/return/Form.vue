@@ -124,7 +124,7 @@
                       <th class="text-center">Name</th>
                       <th class="text-center" width="100px">Invoice</th>
                       <th class="text-center" width="100px">Qty</th>
-                      <th class="text-center" width="200px;">Cost</th>
+                      <th class="text-center" width="200px;">Price</th>
                       <th class="text-center" width="200px;">Total</th>
                     </tr>
                   </thead>
@@ -133,8 +133,8 @@
                       <td>{{ item.name }}</td>
                       <td>{{ item.invoice_qty }}</td>
                       <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" @change="checkQty(index)" /></td>
-                      <td class="text-right">{{ item.cost | currency }}</td>
-                      <td class="text-right">{{ item.qty * item.cost | currency }}</td>
+                      <td class="text-right">{{ item.price | currency }}</td>
+                      <td class="text-right">{{ item.qty * item.price | currency }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -201,7 +201,7 @@ export default {
       if (items.length == 0) return;
       let total = 0;
       for(var i=0;i<items.length;i++){
-        total += items[i].qty * items[i].cost;
+        total += items[i].qty * items[i].price;
       }
       return total;
     }
@@ -324,7 +324,7 @@ export default {
                   name: item.product.name,
                   invoice_item: item.invoice_item._id,
                   product: item.product._id,
-                  cost: item.cost,
+                  price: item.price,
                   invoice_qty: item.qty + (item.invoice_item.qty - item.invoice_item.return_qty),
                   qty: item.qty
                 }
@@ -347,7 +347,7 @@ export default {
                     name: item.product.name,
                     invoice_item: item._id,
                     product: item.product._id,
-                    cost: item.cost,
+                    price: item.price,
                     invoice_qty: item.qty - item.return_qty,
                     qty: 0
                   }

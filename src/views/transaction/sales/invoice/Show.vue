@@ -134,7 +134,7 @@
                             <th class="text-center" width="50px">Receipt</th>
                             <th class="text-center" width="50px">Invoice</th>
                             <th class="text-center" width="50px">Return</th>
-                            <th class="text-center" width="150px">Cost</th>
+                            <th class="text-center" width="150px">Price</th>
                             <th class="text-center" width="150px">Order</th>
                             <th class="text-center" width="150px">Invoice</th>
                             <th class="text-center" width="150px">Return</th>
@@ -147,10 +147,10 @@
                                 <td>{{ item.deliv_qty }}</td>
                                 <td>{{ item.qty }}</td>
                                 <td>{{ item.return_qty }}</td>
-                                <td>{{ item.cost | currency }}</td>
-                                <td>{{ item.order_qty * item.cost | currency }}</td>
-                                <td>{{ item.qty * item.cost | currency }}</td>
-                                <td>{{ item.return_qty * item.cost | currency }}</td>
+                                <td>{{ item.price | currency }}</td>
+                                <td>{{ item.order_qty * item.price | currency }}</td>
+                                <td>{{ item.qty * item.price | currency }}</td>
+                                <td>{{ item.return_qty * item.price | currency }}</td>
                             </tr>
                             <tr>
                                 <td class="text-center" colspan="6">Total</td>
@@ -204,7 +204,7 @@ export default {
                     item = {
                         name: item.product.name,
                         product: item.product._id,
-                        cost: item.cost,
+                        price: item.price,
                         qty: item.qty,
                         deliv_qty: item.deliv_qty,
                         order_qty: item.order_qty,
@@ -274,7 +274,7 @@ export default {
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].order_qty * items[i].cost;
+                total += items[i].order_qty * items[i].price;
             }
             return total;
         },
@@ -283,7 +283,7 @@ export default {
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].qty * items[i].cost;
+                total += items[i].qty * items[i].price;
             }
             return total;
         },
@@ -292,7 +292,7 @@ export default {
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].return_qty * items[i].cost;
+                total += items[i].return_qty * items[i].price;
             }
             return total;
         }

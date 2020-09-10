@@ -125,7 +125,7 @@
                             <th class="text-center">Name</th>
                             <th class="text-center">Invoice</th>
                             <th class="text-center">Qty</th>
-                            <th class="text-center">Cost</th>
+                            <th class="text-center">Price</th>
                             <th class="text-center">Total</th>
                             </tr>
                         </thead>
@@ -134,8 +134,8 @@
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.invoice_qty }}</td>
                                 <td>{{ item.qty }}</td>
-                                <td>{{ item.cost | currency }}</td>
-                                <td>{{ item.qty * item.cost | currency }}</td>
+                                <td>{{ item.price | currency }}</td>
+                                <td>{{ item.qty * item.price | currency }}</td>
                             </tr>
                             <tr>
                                 <td class="text-center" colspan="4">Total</td>
@@ -188,7 +188,7 @@ export default {
                         name: item.product.name,
                         invoice_item: item.invoice_item._id,
                         product: item.product._id,
-                        cost: item.cost,
+                        price: item.price,
                         invoice_qty: item.invoice_qty,
                         qty: item.qty
                         }
@@ -256,7 +256,7 @@ export default {
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].qty * items[i].cost;
+                total += items[i].qty * items[i].price;
             }
             return total;
         }

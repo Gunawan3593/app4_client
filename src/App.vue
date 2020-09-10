@@ -34,6 +34,14 @@
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item link to="/inventory">
+          <v-list-item-action>
+            <v-icon>mdi-dropbox</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Inventory</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-group
           prepend-icon="mdi-folder-open"
           no-action

@@ -151,7 +151,7 @@
                             <th class="text-center" width="50px">Order</th>
                             <th class="text-center" width="50px">Deliv.</th>
                             <th class="text-center" width="50px">Outs.</th>
-                            <th class="text-center" width="200px">Cost</th>
+                            <th class="text-center" width="200px">Price</th>
                             <th class="text-center" width="200px">Order</th>
                             <th class="text-center" width="200px">Deliv.</th>
                             </tr>
@@ -162,9 +162,9 @@
                                 <td>{{ item.qty }}</td>
                                 <td>{{ item.deliv_qty }}</td>
                                 <td>{{ item.qty - item.deliv_qty }}</td>
-                                <td>{{ item.cost | currency }}</td>
-                                <td>{{ item.qty * item.cost | currency }}</td>
-                                <td>{{ item.deliv_qty * item.cost | currency }}</td>
+                                <td>{{ item.price | currency }}</td>
+                                <td>{{ item.qty * item.price | currency }}</td>
+                                <td>{{ item.deliv_qty * item.price | currency }}</td>
                             </tr>
                             <tr>
                                 <td class="text-center" colspan="5">Total</td>
@@ -217,7 +217,7 @@ export default {
                     item = {
                         name: item.product.name,
                         product: item.product._id,
-                        cost: item.cost,
+                        price: item.price,
                         qty: item.qty,
                         deliv_qty: item.deliv_qty
                     }
@@ -285,7 +285,7 @@ export default {
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].qty * items[i].cost;
+                total += items[i].qty * items[i].price;
             }
             return total;
         },
@@ -294,7 +294,7 @@ export default {
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].deliv_qty * items[i].cost;
+                total += items[i].deliv_qty * items[i].price;
             }
             return total;
         }

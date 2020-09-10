@@ -64,6 +64,21 @@ const actions = {
             commit('salesOrder_Api_error',err);
         }
     },
+    // Get Data Order Receivable by customer by Product
+    async getSoDelivByProduct({ commit }){
+        try {
+            commit('salesOrder_request');
+            let res = await axios.get(apiPath+'/api/sales/orders/delivbyproduct');
+            if (res.data.success) {
+                commit('salesOrder_success', res);
+            }else{
+                return commit('salesOrder_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('salesOrder_Api_error',err);
+        }
+    },
     // Get Items
     async getSoItem ({ commit }, data) {
         try {

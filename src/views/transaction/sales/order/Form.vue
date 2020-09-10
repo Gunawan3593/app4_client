@@ -117,7 +117,7 @@
                     <tr>
                       <th class="text-center">Name</th>
                       <th class="text-center" width="100px">Qty</th>
-                      <th class="text-center" width="200px;">Cost</th>
+                      <th class="text-center" width="200px;">Price</th>
                       <th class="text-center" width="200px;">Total</th>
                       <th class="text-center" width="50px;">Action</th>
                     </tr>
@@ -126,8 +126,8 @@
                     <tr v-for="item in fields.items" :key="item.product">
                         <td>{{ item.name }}</td>
                         <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" /></td>
-                        <td class="text-right">{{ item.cost | currency }}</td>
-                        <td class="text-right">{{ item.qty * item.cost | currency }}</td>
+                        <td class="text-right">{{ item.price | currency }}</td>
+                        <td class="text-right">{{ item.qty * item.price | currency }}</td>
                         <td><v-icon
                               small
                               @click="deleteItem(item)"
@@ -194,7 +194,7 @@ export default {
       if (items.length == 0) return;
       let total = 0;
       for(var i=0;i<items.length;i++){
-        total += items[i].qty * items[i].cost;
+        total += items[i].qty * items[i].price;
       }
       return total;
     }
@@ -307,7 +307,7 @@ export default {
                   item = {
                     name: item.product.name,
                     product: item.product._id,
-                    cost: item.cost,
+                    price: item.price,
                     qty: item.qty
                   }
                   this.fields.items.push(item);
@@ -325,7 +325,7 @@ export default {
           product: data._id,
           name: data.name,
           qty: 1,
-          cost: data.cost
+          price: data.price
         }
         this.fields.items.push(row);
       }

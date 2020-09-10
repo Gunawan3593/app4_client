@@ -125,7 +125,7 @@
                       <th class="text-center" width="100px">Order</th>
                       <th class="text-center" width="100px">Stock</th>
                       <th class="text-center" width="100px">Qty</th>
-                      <th class="text-center" width="200px;">Cost</th>
+                      <th class="text-center" width="200px;">Price</th>
                       <th class="text-center" width="200px;">Total</th>
                     </tr>
                   </thead>
@@ -144,8 +144,8 @@
                             <span>Warning : Stock is not enough !<br> If you still save the delivery, <br> Stock will have minus value</span>
                           </v-tooltip>
                       <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" @change="checkQty(index)" /></td>
-                      <td class="text-right">{{ item.cost | currency }}</td>
-                      <td class="text-right">{{ item.qty * item.cost | currency }}</td>
+                      <td class="text-right">{{ item.price | currency }}</td>
+                      <td class="text-right">{{ item.qty * item.price | currency }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -212,7 +212,7 @@ export default {
       if (items.length == 0) return;
       let total = 0;
       for(var i=0;i<items.length;i++){
-        total += items[i].qty * items[i].cost;
+        total += items[i].qty * items[i].price;
       }
       return total;
     }
@@ -335,7 +335,7 @@ export default {
                   name: item.product.name,
                   order_item: item.order_item._id,
                   product: item.product._id,
-                  cost: item.cost,
+                  price: item.price,
                   order_qty: item.qty + (item.order_item.qty - item.order_item.deliv_qty),
                   qty: item.qty,
                   stock: item.qty
@@ -366,7 +366,7 @@ export default {
                     name: item.product.name,
                     order_item: item._id,
                     product: item.product._id,
-                    cost: item.cost,
+                    price: item.price,
                     order_qty: item.qty - item.deliv_qty,
                     qty: item.qty - item.deliv_qty,
                     stock: 0

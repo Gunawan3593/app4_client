@@ -270,6 +270,11 @@ const routes = [
         }
     },
     {
+      path: '/inventory',
+      name: 'inventory',
+      component: () => import('../views/Inventory.vue')
+    },
+    {
         path: '/login',
         name: 'login',
         component: () => import('../views/Login.vue'),

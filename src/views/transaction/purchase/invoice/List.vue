@@ -31,12 +31,6 @@
               :search="search"
               :page.sync = "page"
           >
-          <template v-slot:[`item.cost`]="{ item }">
-            {{ item.cost | currency }}
-          </template>
-          <template v-slot:[`item.price`]="{ item }">
-            {{ item.price | currency }}
-          </template>
           <template v-slot:[`item.active`]="{ item }">
             <v-icon v-if="item.active" color="blue" dark>mdi-check-circle</v-icon>
             <v-icon v-if="!item.active" color="red" dark>mdi-minus-circle</v-icon>

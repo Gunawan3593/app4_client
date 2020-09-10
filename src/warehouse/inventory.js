@@ -11,11 +11,24 @@ const getters = {
 }
 
 const actions = {
-    // Get Data
+    // Check Stock
     async checkStock({ commit },data){
         try {
             commit('inventory_request');
             let res = await axios.get(apiPath+'/api/inventories/checkstock/'+data);
+            if (res.data.success) {
+                commit('inventory_success', res);
+            }
+            return res;
+        }catch(err){
+            commit('inventory_error',err);
+        }
+    },
+    // Get data
+    async getInventory({ commit }){
+        try {
+            commit('inventory_request');
+            let res = await axios.get(apiPath+'/api/inventories/data');
             if (res.data.success) {
                 commit('inventory_success', res);
             }
