@@ -14,7 +14,13 @@
           dark
           flat
         >
-          <v-toolbar-title>Purchase Invoice List</v-toolbar-title>
+          <v-toolbar-title>Purchase Return List</v-toolbar-title>
+          <v-tooltip left color="blue">
+              <template v-slot:activator="{ on, attrs}">
+                <v-btn icon color="dee-orange" link to="/purchase/return/add" v-bind="attrs" v-on="on"><v-icon>mdi-plus-thick</v-icon></v-btn>
+              </template>
+              <span>Add New Transaction</span>
+          </v-tooltip>
           <v-spacer></v-spacer>
             <v-text-field
               v-model="search"
@@ -50,7 +56,7 @@
                 color="green"
                 text-color="white"
               >
-                Closed
+                Done
               </v-chip>
               <v-chip
                 v-if="item.status == 2"
@@ -58,14 +64,6 @@
                 color="error"
               >
                 Void
-              </v-chip>
-              <v-chip
-                v-if="item.status == 4"
-                class="ma-1"
-                color="green"
-                text-color="white"
-              >
-                Done
               </v-chip>
             </div>
           </template>
@@ -83,23 +81,8 @@
                   >
                     mdi-pencil
                   </v-icon>
-              </template>
-                <span>Edit</span>
-              </v-tooltip>
-              <v-tooltip left>
-                <template v-slot:activator="{ on, attrs}">
-                  <v-icon
-                    v-if="item.status == 2"
-                    class="mr-2"
-                    small
-                    @click="genInvoice(item)"
-                    v-bind="attrs" 
-                    v-on="on"
-                  >
-                    mdi-file-move-outline
-                  </v-icon>
                 </template>
-                <span>Generate Invoice</span>
+                <span>Edit</span>
               </v-tooltip>
               <v-tooltip left>
                 <template v-slot:activator="{ on, attrs}">
@@ -124,7 +107,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
 export default {
   data() {
     return {
@@ -138,10 +121,10 @@ export default {
           value: 'no',
         },
         {
-          text: 'Po No.',
+          text: 'Invoice No.',
           align: 'start',
           sortable: false,
-          value: 'order.no',
+          value: 'invoice.no',
         },
         { text: 'Date.', value: 'transdate' },
         { text: 'Supplier', value: 'supplier.name' },
@@ -151,11 +134,14 @@ export default {
       rows: []
     }
   },
-  computed: {
-    ...mapGetters(['user']),
-  },
   async mounted(){
-    await this.loadData();
+    let data = await this.getPurchaseReturn();
+    if (data.data.success) {
+      this.rows = data.data.data;
+      this.rows.forEach(row => {
+        row.transdate = this.getDateTime(row.transdate);
+      });
+    }
     let page = this.$route.params.page;
     if(page != undefined){
       this.page = parseInt(page);
@@ -165,18 +151,9 @@ export default {
     
   },
   methods: {
-    ...mapActions(['getPurchaseInvoice']),
+    ...mapActions(['getPurchaseReturn']),
     editItem(item) {
-      this.$router.push({ path: '/purchase/invoice/edit/'+item._id, query: { page: this.page }});
-    },
-    async loadData(){
-      let data = await this.getPurchaseInvoice();
-      if (data.data.success) {
-        this.rows = data.data.data;
-        this.rows.forEach(row => {
-          row.transdate = this.getDateTime(row.transdate);
-        });
-      }
+      this.$router.push({ path: '/purchase/return/edit/'+item._id, query: { page: this.page }});
     },
     getDateTime(date){
       const dates = new Date(date);
@@ -187,7 +164,7 @@ export default {
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     showItem(item){
-      this.$router.push({ path: '/purchase/invoice/show/'+item._id, query: { page: this.page }});
+      this.$router.push({ path: '/purchase/return/show/'+item._id, query: { page: this.page }});
     }
   }
 }

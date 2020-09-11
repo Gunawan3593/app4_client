@@ -6,9 +6,11 @@
         >
             <v-card-text>
                 <v-row>
-                    <h2 class="ma-1">Purchase Receipt Detail</h2>
+                    <h2 class="ma-1">Sales Return Detail</h2>
                     <v-spacer></v-spacer>
                     <v-btn class="ma-1" v-if="status == 0" @click="voidData()" small color="error">Void</v-btn>
+                    <v-btn class="ma-1" v-if="status == 0" @click="closeData()" small color="success">Close</v-btn>
+                    <v-btn class="ma-1" v-if="status == 1" @click="openData()" small color="orange" dark>Open</v-btn>
                     <v-btn class="ma-1" small color="primary" @click="Back()">Back</v-btn>
                 </v-row>
             </v-card-text>
@@ -40,9 +42,9 @@
                             <td>{{ date }}</td>
                         </tr>
                         <tr>
-                            <td>Supplier</td>
+                            <td>Customer</td>
                             <td>:</td>
-                            <td>{{ supplier.name }}</td>
+                            <td>{{ customer.name }}</td>
                         </tr>
                     </tbody>
                     </template>
@@ -121,19 +123,19 @@
                         <thead>
                             <tr>
                             <th class="text-center">Name</th>
-                            <th class="text-center">Order</th>
+                            <th class="text-center">Invoice</th>
                             <th class="text-center">Qty</th>
-                            <th class="text-center">Cost</th>
+                            <th class="text-center">Price</th>
                             <th class="text-center">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="item in items" :key="item.product">
                                 <td>{{ item.name }}</td>
-                                <td>{{ item.order_qty }}</td>
+                                <td>{{ item.invoice_qty }}</td>
                                 <td>{{ item.qty }}</td>
-                                <td>{{ item.cost | currency }}</td>
-                                <td>{{ item.qty * item.cost | currency }}</td>
+                                <td>{{ item.price | currency }}</td>
+                                <td>{{ item.qty * item.price | currency }}</td>
                             </tr>
                             <tr>
                                 <td class="text-center" colspan="4">Total</td>
@@ -156,7 +158,7 @@ export default {
             id: '',
             no: '',
             date: '',
-            supplier: '',
+            customer: '',
             notes: '',
             status: '',
             user: '',
@@ -164,7 +166,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getPurchaseReceipt','getPrItem','voidPurchaseReceipt']),
+        ...mapActions(['getSalesReturn','getSrItem','voidSalesReturn','openSalesReturn','closeSalesReturn']),
         getDateTime(date){
             const dates = new Date(date);
             const hours = dates.getHours().toString();
@@ -175,19 +177,19 @@ export default {
         },
         getItem(id){
             let data = {
-                receipt: id
+                returns: id
             }
-            this.getPrItem(data).then(res => {
+            this.getSrItem(data).then(res => {
                 if(res.data.success) {
                     let items = res.data.data;
                     this.items = [];
                     items.forEach(item => {
                         item = {
                         name: item.product.name,
-                        order_item: item.order_item._id,
+                        invoice_item: item.invoice_item._id,
                         product: item.product._id,
-                        cost: item.cost,
-                        order_qty: item.order_qty,
+                        price: item.price,
+                        invoice_qty: item.invoice_qty,
                         qty: item.qty
                         }
                         this.items.push(item);
@@ -196,13 +198,13 @@ export default {
             });
         },
         async loadData(id) {
-            let res = await this.getPurchaseReceipt(id);
+            let res = await this.getSalesReturn(id);
             if (res != undefined) {
                 let rspn = res.data.data;
                 this.id = id;
                 this.no = rspn.no;
                 this.date = this.getDateTime(rspn.date);
-                this.supplier = rspn.supplier;
+                this.customer = rspn.customer;
                 this.notes = rspn.notes;
                 this.status = rspn.status;
                 this.user = rspn.user;
@@ -213,7 +215,27 @@ export default {
             let data = {
                 id : this.id
             }
-            this.voidPurchaseReceipt(data).then(res => {
+            this.voidSalesReturn(data).then(res => {
+                if(res.data.success){
+                   this.loadData(this.id);
+                }
+            })
+        },
+        closeData(){
+            let data = {
+                id : this.id
+            }
+            this.closeSalesReturn(data).then(res => {
+                if(res.data.success){
+                   this.loadData(this.id);
+                }
+            })
+        },
+        openData(){
+            let data = {
+                id : this.id
+            }
+            this.openSalesReturn(data).then(res => {
                 if(res.data.success){
                    this.loadData(this.id);
                 }
@@ -221,7 +243,7 @@ export default {
         },
         Back(){
             let page = this.$route.query.page;
-            this.$router.push({ name: 'prlist', params: { page : page }});
+            this.$router.push({ name: 'srlist', params: { page : page }});
         }
     },
     created(){
@@ -234,7 +256,7 @@ export default {
             if (items.length == 0) return;
             let total = 0;
             for(var i=0;i<items.length;i++){
-                total += items[i].qty * items[i].cost;
+                total += items[i].qty * items[i].price;
             }
             return total;
         }

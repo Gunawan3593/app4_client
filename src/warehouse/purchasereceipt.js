@@ -1,5 +1,6 @@
 import axios from 'axios';
 import base from '../warehouse/base';
+const apiPath = process.env.VUE_APP_API_PATH;
 
 const state = {
     status : ''
@@ -14,7 +15,7 @@ const actions = {
     async getPrNo({ commit }){
         try {
             commit('purchaseReceipt_request');
-            let res = await axios.get('http://localhost:5000/api/purchase/receipts/getcode');
+            let res = await axios.get(apiPath+'/api/purchase/receipts/getcode');
             if (res.data.success) {
                 commit('purchaseReceipt_success', res);
             }else{
@@ -33,7 +34,7 @@ const actions = {
         }
         try {
             commit('purchaseReceipt_request');
-            let res = await axios.get('http://localhost:5000/api/purchase/receipts/data'+data);
+            let res = await axios.get(apiPath+'/api/purchase/receipts/data'+data);
             if (res.data.success) {
                 commit('purchaseReceipt_success', res);
             }else{
@@ -48,7 +49,7 @@ const actions = {
     async getPrItem ({ commit }, data) {
         try {
             commit('purchaseReceipt_request');
-            let res = await axios.post('http://localhost:5000/api/purchase/receipts/item', data);
+            let res = await axios.post(apiPath+'/api/purchase/receipts/item', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReceipt_success', res);
             }else{
@@ -63,7 +64,7 @@ const actions = {
     async addPurchaseReceipt({ commit }, data) {
         try {
             commit('purchaseReceipt_request');
-            let res = await axios.post('http://localhost:5000/api/purchase/receipts/add', data);
+            let res = await axios.post(apiPath+'/api/purchase/receipts/add', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReceipt_success', res);
             }else{
@@ -78,7 +79,7 @@ const actions = {
     async updatePurchaseReceipt({ commit }, data) {
         try {
             commit('purchaseReceipt_request');
-            let res = await axios.post('http://localhost:5000/api/purchase/receipts/update', data);
+            let res = await axios.post(apiPath+'/api/purchase/receipts/update', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReceipt_success', res);
             }else{
@@ -93,7 +94,7 @@ const actions = {
     async voidPurchaseReceipt({ commit }, data) {
         try {
             commit('purchaseReceipt_request');
-            let res = await axios.post('http://localhost:5000/api/purchase/receipts/void', data);
+            let res = await axios.post(apiPath+'/api/purchase/receipts/void', data);
             if (res.data.success !== undefined) {
                 commit('purchaseReceipt_success', res);
             }else{

@@ -14,7 +14,13 @@
           dark
           flat
         >
-          <v-toolbar-title>Purchase Invoice List</v-toolbar-title>
+          <v-toolbar-title>Sales Order List</v-toolbar-title>
+          <v-tooltip left color="blue">
+              <template v-slot:activator="{ on, attrs}">
+                <v-btn icon color="dee-orange" link to="/sales/order/add" v-bind="attrs" v-on="on"><v-icon>mdi-plus-thick</v-icon></v-btn>
+              </template>
+              <span>Add New Transaction</span>
+          </v-tooltip>
           <v-spacer></v-spacer>
             <v-text-field
               v-model="search"
@@ -47,13 +53,21 @@
               <v-chip
                 v-if="item.status == 1"
                 class="ma-1"
-                color="green"
+                color="orange"
+                text-color="white"
+              >
+                Deliveriying
+              </v-chip>
+              <v-chip
+                v-if="item.status == 2"
+                class="ma-1"
+                color="purple"
                 text-color="white"
               >
                 Closed
               </v-chip>
               <v-chip
-                v-if="item.status == 2"
+                v-if="item.status == 3"
                 class="ma-1"
                 color="error"
               >
@@ -137,14 +151,8 @@ export default {
           sortable: false,
           value: 'no',
         },
-        {
-          text: 'Po No.',
-          align: 'start',
-          sortable: false,
-          value: 'order.no',
-        },
         { text: 'Date.', value: 'transdate' },
-        { text: 'Supplier', value: 'supplier.name' },
+        { text: 'Customer', value: 'customer.name' },
         { text: 'Status', value: 'status' },
         { text: 'Actions', value: 'actions', sortable: false }
       ],
@@ -165,12 +173,12 @@ export default {
     
   },
   methods: {
-    ...mapActions(['getPurchaseInvoice']),
+    ...mapActions(['getSalesOrder','genSalesInvoice','getSoItem']),
     editItem(item) {
-      this.$router.push({ path: '/purchase/invoice/edit/'+item._id, query: { page: this.page }});
+      this.$router.push({ path: '/sales/order/edit/'+item._id, query: { page: this.page }});
     },
     async loadData(){
-      let data = await this.getPurchaseInvoice();
+      let data = await this.getSalesOrder();
       if (data.data.success) {
         this.rows = data.data.data;
         this.rows.forEach(row => {
@@ -187,8 +195,46 @@ export default {
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     showItem(item){
-      this.$router.push({ path: '/purchase/invoice/show/'+item._id, query: { page: this.page }});
-    }
+      this.$router.push({ path: '/sales/order/show/'+item._id, query: { page: this.page }});
+    },
+    async genInvoice(item){
+      let items = await this.getItem(item._id);
+      let data = {
+        transdate: this.getDateTime(new Date()),
+        customer: item.customer._id,
+        order: item._id,
+        notes: 'Generate Invoice Automatically.',
+        user: this.user._id,
+        items: items
+      }
+      this.genSalesInvoice(data).then(res => {
+        if(res.data.success) {
+            this.loadData();
+        }
+      });
+    },
+    async getItem(id){
+        let data = {
+          order: id
+        }
+        let items = await this.getSoItem(data);
+        let rspn = items.data.data;
+        let response = [];
+        rspn.forEach(item => {
+          item = {
+            name: item.product.name,
+            product: item.product._id,
+            order_item : item._id,
+            order_qty: item.qty,
+            deliv_qty: item.deliv_qty,
+            qty: item.deliv_qty,
+            price: item.price
+          }
+          response.push(item);
+        });
+
+        return response;
+    },
   }
 }
 </script>

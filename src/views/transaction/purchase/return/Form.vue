@@ -14,7 +14,7 @@
           dark
           flat
         >
-          <v-toolbar-title>Add Purchase Order</v-toolbar-title>
+          <v-toolbar-title>Add Purchase Return</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-title>
               <v-tooltip left>
@@ -25,7 +25,7 @@
               </v-tooltip>
               <v-tooltip left>
               <template v-slot:activator="{ on, attrs}">
-                <v-btn icon color="dee-orange" link to="/purchase/order/add"  v-bind="attrs" v-on="on"><v-icon>mdi-restore</v-icon></v-btn>
+                <v-btn icon color="dee-orange" link to="/purchase/return/add"  v-bind="attrs" v-on="on"><v-icon>mdi-restore</v-icon></v-btn>
               </template>
               <span>New Data</span>
               </v-tooltip>
@@ -84,6 +84,7 @@
                     placeholder="Start typing to Search"
                     prepend-icon="mdi-dresser"
                     :return-object="false"
+                    @change="loadInvoice($event)"
                     @input="$v.fields.supplier.$touch()"
                     @blur="$v.fields.supplier.$touch()"
                 ></v-autocomplete>
@@ -93,16 +94,21 @@
           <v-row>
             <v-col cols="12" sm="6" md="4">
               <v-autocomplete
-                  v-model="productSelected"
-                  :items="productItems"
-                  hide-no-data
-                  hide-selected
-                  item-text="Description"
-                  label="Product"
-                  placeholder="Select Product"
-                  prepend-icon="mdi-database-search"
-                  return-object
-                  @change="addItem()"
+                    v-model="fields.invoice"
+                    :error-messages="invoiceErrors"
+                    required
+                    :items="invoiceItems"
+                    hide-no-data
+                    hide-selected
+                    item-text="Description"
+                    item-value="_id"
+                    label="Invoice"
+                    placeholder="Start typing to Search"
+                    prepend-icon="mdi-cart-outline"
+                    :return-object="false"
+                    @change="getInvoiceItem($event)"
+                    @input="$v.fields.invoice.$touch()"
+                    @blur="$v.fields.invoice.$touch()"
                 ></v-autocomplete>
             </v-col>
             <v-col cols="12" sm="6" md="8">
@@ -116,25 +122,19 @@
                   <thead>
                     <tr>
                       <th class="text-center">Name</th>
+                      <th class="text-center" width="100px">Invoice</th>
                       <th class="text-center" width="100px">Qty</th>
                       <th class="text-center" width="200px;">Cost</th>
                       <th class="text-center" width="200px;">Total</th>
-                      <th class="text-center" width="50px;">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="item in fields.items" :key="item.product">
-                        <td>{{ item.name }}</td>
-                        <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" /></td>
-                        <td class="text-right">{{ item.cost | currency }}</td>
-                        <td class="text-right">{{ item.qty * item.cost | currency }}</td>
-                        <td><v-icon
-                              small
-                              @click="deleteItem(item)"
-                            >
-                              mdi-delete
-                            </v-icon>
-                        </td>
+                    <tr v-for="(item,index) in fields.items" :key="item.product">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.invoice_qty }}</td>
+                      <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" @change="checkQty(index)" /></td>
+                      <td class="text-right">{{ item.cost | currency }}</td>
+                      <td class="text-right">{{ item.qty * item.cost | currency }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -166,15 +166,22 @@ export default {
   mixins: [validationMixin],
   validations: {
     fields: {
-      supplier: { required }
+      supplier: { required },
+      invoice: { required }
     }
   },
   computed: {
-    ...mapGetters(['user','purchaseOrderStatus']),
+    ...mapGetters(['user','purchaseReturnStatus']),
     supplierErrors () {
       const errors = []
       if (!this.$v.fields.supplier.$dirty) return errors
       !this.$v.fields.supplier.required && errors.push('Supplier is required.')
+      return errors
+    },
+    invoiceErrors () {
+      const errors = []
+      if (!this.$v.fields.invoice.$dirty) return errors
+      !this.$v.fields.invoice.required && errors.push('Invoice is required.')
       return errors
     },
     supplierItems () {
@@ -183,10 +190,10 @@ export default {
         return Object.assign({}, supplier, { Description })
       })
     },
-    productItems () {
-      return this.products.map(product => {
-        const Description = product.name
-        return Object.assign({}, product, { Description })
+    invoiceItems () {
+      return this.invoices.map(invoice => {
+        const Description = invoice.no
+        return Object.assign({}, invoice, { Description })
       })
     },
     getSubtotal() {
@@ -205,6 +212,7 @@ export default {
         id: false,
         no: '',
         transdate: '',
+        invoice: '',
         supplier: '',
         notes: '',
         user: '',
@@ -212,10 +220,10 @@ export default {
       },
       date : '',
       suppliers: [],
+      invoices: [],
       products: [],
       isLoading: false,
       menu: false,
-      productSelected: '',
       page: ''
     }
   },
@@ -224,11 +232,6 @@ export default {
     let data = res.data.data;
     if(data) {
       this.suppliers = data;
-    }
-    res = await this.getProduct();
-    data = res.data.data;
-    if(data) {
-      this.products = data;
     }
     let id = this.$route.params.id;
     if (id != undefined) {
@@ -242,7 +245,7 @@ export default {
     this.page = page;
   },
   methods: {
-    ...mapActions(['getPoNo','getSupplier','getProduct','addPurchaseOrder','getPoItem','updatePurchaseOrder','getPurchaseOrder']),
+    ...mapActions(['getRtNo','getSupplier','addPurchaseReturn','getPiItem','getRtItem','updatePurchaseReturn','getPurchaseReturn','getInvoiceReturnable']),
     getDateTime(date){
       const dates = new Date(date);
       const hours = new Date().getHours().toString();
@@ -252,13 +255,15 @@ export default {
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     async loadData(id) {
-      let res = await this.getPurchaseOrder(id);
+      let res = await this.getPurchaseReturn(id);
       if(res == undefined){
-        return this.$router.push({ name: 'polist' });
+        return this.$router.push({ name: 'rtlist' });
       }
       let rspn = res.data.data;
       this.fields.id = id;
       this.fields.no = rspn.no;
+      this.invoices.push(rspn.invoice);
+      this.fields.invoice = rspn.invoice._id;
       this.fields.notes = rspn.notes;
       this.fields.user = this.user._id;
       this.fields.supplier = rspn.supplier._id;
@@ -266,26 +271,37 @@ export default {
       this.fields.transdate = rspn.transdate;
       this.date = rspn.transdate.slice(0,10);
     },
+    async loadInvoice(id){
+      let res = await this.getInvoiceReturnable(id);
+      let data = res.data.data;
+      this.invoices = [];
+      this.fields.items = [];
+      if(data != undefined){
+        data.forEach(invoice => {
+          this.invoices.push(invoice);
+        });
+      }
+    },
     addData() {
         this.isloading = true;
-        this.addPurchaseOrder(this.fields).then(res => {
+        this.addPurchaseReturn(this.fields).then(res => {
             if(res.data.success) {
                 this.isloading = false;
-                this.$router.push('/purchase/order/list');
+                this.$router.push('/purchase/return/list');
             }
         })
     },
     updateData() {
         this.isloading = true;
-        this.updatePurchaseOrder(this.fields).then(res => {
+        this.updatePurchaseReturn(this.fields).then(res => {
             if(res.data.success) {
                 this.isloading = false;
-                this.$router.push({ name : 'polist', params: { page : this.page }});
+                this.$router.push({ name : 'rtlist', params: { page : this.page }});
             }
         })
     },
     async reset(){
-      let data = await this.getPoNo();
+      let data = await this.getRtNo();
       this.fields.id = false;
       this.fields.no = data.data.code;
       this.date = new Date().toISOString().slice(0,10);
@@ -296,47 +312,59 @@ export default {
       this.fields.transdate = new Date();
     },
     getItem(id){
-        let data = {
-          order: id
-        }
-        this.getPoItem(data).then(res => {
-            if(res.data.success) {
-                let items = res.data.data;
-                this.fields.items = [];
-                items.forEach(item => {
+      let data = {
+        returns: id
+      }
+      this.getRtItem(data).then(res => {
+          if(res.data.success) {
+              let items = res.data.data;
+              this.fields.items = [];
+              items.forEach(item => {
+                item = {
+                  name: item.product.name,
+                  invoice_item: item.invoice_item._id,
+                  product: item.product._id,
+                  cost: item.cost,
+                  invoice_qty: item.qty + (item.invoice_item.qty - item.invoice_item.return_qty),
+                  qty: item.qty
+                }
+                this.fields.items.push(item);
+              });
+          }
+      });
+    },
+    getInvoiceItem(id){
+      let data = {
+        invoice: id
+      }
+      this.getPiItem(data).then(res => {
+          if(res.data.success) {
+              let items = res.data.data;
+              this.fields.items = [];
+              items.forEach(item => {
+                if (item.qty - item.return_qty > 0) {
                   item = {
                     name: item.product.name,
+                    invoice_item: item._id,
                     product: item.product._id,
                     cost: item.cost,
-                    qty: item.qty
+                    invoice_qty: item.qty - item.return_qty,
+                    qty: 0
                   }
                   this.fields.items.push(item);
-                });
-            }
-        });
-    },
-    addItem(){
-      let data = this.productSelected;
-      let index = this.fields.items.findIndex(item => item.product == data._id);
-      if(index >= 0) {
-        this.fields.items[index].qty += 1; 
-      }else{
-        let row = {
-          product: data._id,
-          name: data.name,
-          qty: 1,
-          cost: data.cost
-        }
-        this.fields.items.push(row);
-      }
-      this.productSelected = {};
-    },
-    deleteItem(item) {
-      let index = this.fields.items.findIndex(row => row.product === item.product);
-      this.fields.items.splice(index, 1);
+                }
+              });
+          }
+      });
     },
     Back(){
-        this.$router.push({ name: 'polist', params: { page : this.page }});
+        this.$router.push({ name: 'rtlist', params: { page : this.page }});
+    },
+    checkQty(index){
+      let data = this.fields.items[index];
+      if (data.qty > data.invoice_qty) {
+        data.qty = data.invoice_qty;
+      }
     },
     submit () {
       this.fields.transdate = this.getDateTime(this.date);

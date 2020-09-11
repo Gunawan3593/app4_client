@@ -57,7 +57,6 @@
                       required
                       :items="categoryItems"
                       :loading="isLoading"
-                      :search-input.sync="searchCategory"
                       hide-no-data
                       hide-selected
                       item-text="Description"
@@ -177,29 +176,6 @@ export default {
         })
       },
   },
-  watch: {
-    searchCategory () {
-        // Items have already been loaded
-        if (this.categories.length > 0) return;
-
-        // Items have already been requested
-        if (this.isLoading) return;
-
-        this.isLoading = true;
-
-        // Lazily load input items
-        fetch('http://localhost:5000/api/categories')
-          .then(res => res.json())
-          .then(res => {
-            const categories  = res.data;
-            this.categories = categories;
-          })
-          .catch(err => {
-            console.log(err)
-          })
-          .finally(() => (this.isLoading = false))
-      },
-  },
   data() {
     return {
       search: '',
@@ -233,12 +209,17 @@ export default {
     if (data.data.success) {
       this.rows = data.data.data;
     }
+    let res = await this.getCategory();
+    data = res.data.data;
+    if(data) {
+      this.categories = data;
+    }
   },
   created() {
     
   },
   methods: {
-    ...mapActions(['getProduct','addProduct','updateProduct','deleteProduct']),
+    ...mapActions(['getProduct','getCategory','addProduct','updateProduct','deleteProduct']),
     addData() {
         let data = {
             name: this.name,

@@ -14,7 +14,7 @@
           dark
           flat
         >
-          <v-toolbar-title>Purchase Invoice List</v-toolbar-title>
+          <v-toolbar-title>Sales Invoice List</v-toolbar-title>
           <v-spacer></v-spacer>
             <v-text-field
               v-model="search"
@@ -89,21 +89,6 @@
               <v-tooltip left>
                 <template v-slot:activator="{ on, attrs}">
                   <v-icon
-                    v-if="item.status == 2"
-                    class="mr-2"
-                    small
-                    @click="genInvoice(item)"
-                    v-bind="attrs" 
-                    v-on="on"
-                  >
-                    mdi-file-move-outline
-                  </v-icon>
-                </template>
-                <span>Generate Invoice</span>
-              </v-tooltip>
-              <v-tooltip left>
-                <template v-slot:activator="{ on, attrs}">
-                  <v-icon
                     small
                     @click="showItem(item)"
                     v-bind="attrs" 
@@ -144,7 +129,7 @@ export default {
           value: 'order.no',
         },
         { text: 'Date.', value: 'transdate' },
-        { text: 'Supplier', value: 'supplier.name' },
+        { text: 'Customer', value: 'customer.name' },
         { text: 'Status', value: 'status' },
         { text: 'Actions', value: 'actions', sortable: false }
       ],
@@ -165,12 +150,12 @@ export default {
     
   },
   methods: {
-    ...mapActions(['getPurchaseInvoice']),
+    ...mapActions(['getSalesInvoice']),
     editItem(item) {
-      this.$router.push({ path: '/purchase/invoice/edit/'+item._id, query: { page: this.page }});
+      this.$router.push({ path: '/sales/invoice/edit/'+item._id, query: { page: this.page }});
     },
     async loadData(){
-      let data = await this.getPurchaseInvoice();
+      let data = await this.getSalesInvoice();
       if (data.data.success) {
         this.rows = data.data.data;
         this.rows.forEach(row => {
@@ -187,7 +172,7 @@ export default {
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     showItem(item){
-      this.$router.push({ path: '/purchase/invoice/show/'+item._id, query: { page: this.page }});
+      this.$router.push({ path: '/sales/invoice/show/'+item._id, query: { page: this.page }});
     }
   }
 }

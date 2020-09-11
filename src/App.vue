@@ -34,6 +34,14 @@
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item link to="/inventory">
+          <v-list-item-action>
+            <v-icon>mdi-dropbox</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Inventory</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-group
           prepend-icon="mdi-folder-open"
           no-action
@@ -107,6 +115,14 @@
               <v-list-item-title>Purchase Invoice</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <v-list-item link to="/purchase/return/list">
+            <v-list-item-action>
+              <v-icon>mdi-cart-remove</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Purchase Return</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list-group>
         <v-list-group
           prepend-icon="mdi-cart-arrow-up"
@@ -116,7 +132,7 @@
         <template v-slot:activator>
           <v-list-item-title>Sales</v-list-item-title>
         </template>
-          <v-list-item link to="/salesorder">
+          <v-list-item link to="/sales/order/list">
             <v-list-item-action>
               <v-icon>mdi-shopping</v-icon>
             </v-list-item-action>
@@ -124,7 +140,7 @@
               <v-list-item-title>Sales Order</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item link to="/salesdelivery">
+          <v-list-item link to="/sales/delivery/list">
             <v-list-item-action>
               <v-icon>mdi-truck-fast</v-icon>
             </v-list-item-action>
@@ -132,12 +148,20 @@
               <v-list-item-title>Sales Delivery</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item link to="/salesinvoice">
+          <v-list-item link to="/sales/invoice/list">
             <v-list-item-action>
               <v-icon>mdi-notebook</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Sales Invoice</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item link to="/sales/return/list">
+            <v-list-item-action>
+              <v-icon>mdi-cart-remove</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Sales Return</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list-group>
