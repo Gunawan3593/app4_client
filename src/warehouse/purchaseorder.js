@@ -122,6 +122,36 @@ const actions = {
         }catch(err){
             commit('purchaseOrder_Api_error',err);
         }
+    },
+    // Close Data
+    async closePurchaseOrder({ commit }, data) {
+        try {
+            commit('purchaseOrder_request');
+            let res = await axios.post('http://localhost:5000/api/purchase/orders/close', data);
+            if (res.data.success !== undefined) {
+                commit('purchaseOrder_success', res);
+            }else{
+                return commit('purchaseOrder_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('purchaseOrder_Api_error',err);
+        }
+    },
+    // Open Order 
+    async openPurchaseOrder({ commit }, data) {
+        try {
+            commit('purchaseOrder_request');
+            let res = await axios.post('http://localhost:5000/api/purchase/orders/open', data);
+            if (res.data.success !== undefined) {
+                commit('purchaseOrder_success', res);
+            }else{
+                return commit('purchaseOrder_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('purchaseOrder_Api_error',err);
+        }
     }
 }
 

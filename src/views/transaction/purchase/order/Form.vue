@@ -268,7 +268,7 @@ export default {
       const hours = new Date().getHours().toString();
       const minutes = new Date().getMinutes().toString();
       const seconds = new Date().getSeconds().toString();
-      let time = hours + ':' + minutes + ':' + seconds;
+      let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
       return dates.toISOString().slice(0,10) + ' ' + time;
     },
     async loadData(id) {
