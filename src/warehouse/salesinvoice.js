@@ -153,7 +153,58 @@ const actions = {
         }catch(err){
             commit('salesInvoice_Api_error',err);
         }
+    },
+    // Get data sales by month and year
+    async getSalesInvoiceByMonth({ commit }, data) {
+        try {
+            let date = new Date(data);
+            let param = (date.getMonth()+1) +'/'+ date.getFullYear()
+            commit('salesInvoice_request');
+            let res = await axios.get(apiPath+'/api/sales/invoices/salesbymonth/'+param);
+            if (res.data.success !== undefined) {
+                commit('salesInvoice_success', res);
+            }else{
+                return commit('salesInvoice_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('salesInvoice_Api_error',err);
+        }
+    },
+    // Get top sell product by month and year
+    async getTopSellProductByMonth({ commit }, data) {
+        try {
+            let date = new Date(data);
+            let param = (date.getMonth()+1) +'/'+ date.getFullYear()
+            commit('salesInvoice_request');
+            let res = await axios.get(apiPath+'/api/sales/invoices/topsellproduct/'+param);
+            if (res.data.success !== undefined) {
+                commit('salesInvoice_success', res);
+            }else{
+                return commit('salesInvoice_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('salesInvoice_Api_error',err);
+        }
+    },
+    // Get sales by time with date
+    async getSalesByTime({ commit }, data) {
+        try {
+            let date = new Date(data).toISOString().slice(0,10);
+            commit('salesInvoice_request');
+            let res = await axios.get(apiPath+'/api/sales/invoices/salesbytime/'+date);
+            if (res.data.success !== undefined) {
+                commit('salesInvoice_success', res);
+            }else{
+                return commit('salesInvoice_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('salesInvoice_Api_error',err);
+        }
     }
+
 }
 
 const mutations = {

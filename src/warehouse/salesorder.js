@@ -168,7 +168,24 @@ const actions = {
         }catch(err){
             commit('salesOrder_Api_error',err);
         }
-    }
+    },
+    // get data order by month and year
+    async getSalesOrderByMonth({ commit }, data) {
+        try {
+            let date = new Date(data);
+            let param = (date.getMonth()+1) +'/'+ date.getFullYear()
+            commit('salesOrder_request');
+            let res = await axios.get(apiPath+'/api/sales/orders/orderbymonth/'+param);
+            if (res.data.success !== undefined) {
+                commit('salesOrder_success', res);
+            }else{
+                return commit('salesOrder_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('salesOrder_Api_error',err);
+        }
+    },
 }
 
 const mutations = {

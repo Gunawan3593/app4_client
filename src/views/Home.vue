@@ -17,7 +17,7 @@
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1">ORDER</v-list-item-title>
                 <v-list-item-subtitle>Total Order This Month</v-list-item-subtitle>
-                {{ 1000000 | currency }}
+                {{ total.order | currency }}
             </v-list-item-content>
 
             <v-list-item-avatar
@@ -42,7 +42,7 @@
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1">SALES</v-list-item-title>
                 <v-list-item-subtitle>Total Sales This Month</v-list-item-subtitle>
-                {{ 500000 | currency }}
+                {{ total.sales | currency }}
             </v-list-item-content>
 
             <v-list-item-avatar
@@ -67,7 +67,7 @@
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1">TOP PRODUCT</v-list-item-title>
                 <v-list-item-subtitle>Top Product This Month</v-list-item-subtitle>
-                Koka Kola : {{ 10000 | currency }}
+                {{ top.product.name }} : {{ top.product.total | currency }}
             </v-list-item-content>
 
             <v-list-item-avatar
@@ -158,8 +158,16 @@
 </template>
 
 <script>
+import { mapActions  } from 'vuex';
  export default {
     data: () => ({
+      total : {
+          order : 0,
+          sales : 0
+      },
+      top : {
+          product : {}
+      },
       hourLabels: [
         '08:00',
         '11:00',
@@ -170,16 +178,7 @@
         '02:00',
         '05:00',
       ],
-      hourValue: [
-        100000,
-        50000,
-        30000,
-        40000,
-        80000,
-        90000,
-        40000,
-        70000,
-      ],
+      hourValue: [],
       dayLabels: [
         'Mon',
         'Tue',
@@ -199,6 +198,58 @@
         40000
       ],
     }),
+    methods: {
+        ...mapActions(['getSalesOrderByMonth','getSalesInvoiceByMonth','getTopSellProductByMonth','getSalesByTime']),
+    },
+    async mounted(){
+        let res = await this.getSalesOrderByMonth(new Date());
+        if (res.data.success){
+            this.total.order = res.data.total;
+        }
+        res = await this.getSalesInvoiceByMonth(new Date());
+        if (res.data.success){
+            this.total.sales = res.data.total;
+        }
+        res = await this.getTopSellProductByMonth(new Date());
+        if (res.data.success){
+            this.top.product = res.data.product;
+        }
+        res = await this.getSalesByTime(new Date());
+        if (res.data.success){
+            let data = res.data.data;
+            let hours = [800,1100,1400,1700,2000,2300,200,500];
+            this.hourValue.push([0,0,0,0,0,0,0,0]);
+            let time = 0;
+            data.forEach(row => {
+                time = parseInt(row._id);
+                if (time <= hours[0] && time > hours[7]) {
+                    this.hourValue[0] += row.total;
+                }
+                if (time <= hours[1] && time > hours[0]) {
+                    this.hourValue[1] += row.total;
+                }
+                if (time <= hours[2] && time > hours[1]) {
+                    this.hourValue[2] += row.total;
+                }
+                if (time <= hours[3] && time > hours[2]) {
+                    this.hourValue[3] += row.total;
+                }
+                if (time <= hours[4] && time > hours[3]) {
+                    this.hourValue[4] += row.total;
+                }
+                if (time <= hours[5] && time > hours[4]) {
+                    this.hourValue[5] += row.total;
+                }
+                if (time <= hours[6] && time > hours[5]) {
+                    this.hourValue[6] += row.total;
+                }
+                if (time <= hours[7] && time > hours[6]) {
+                    this.hourValue[7] += row.total;
+                }
+            });
+            console.log(this.hourValue);
+        }
+    }
   }
 </script>
 

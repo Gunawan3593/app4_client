@@ -7,7 +7,12 @@ const getters = {
     alert: state => state.alert
 };
 
+const actions = {
+
+}
+
 export default {
     state,
-    getters
+    getters,
+    actions
 };

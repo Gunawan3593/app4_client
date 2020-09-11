@@ -228,7 +228,7 @@ export default {
             order_qty: item.qty,
             deliv_qty: item.deliv_qty,
             qty: item.deliv_qty,
-            cost: item.cost
+            price: item.price
           }
           response.push(item);
         });

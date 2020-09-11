@@ -116,6 +116,7 @@
                   <thead>
                     <tr>
                       <th class="text-center">Name</th>
+                      <th class="text-center" width="100px">Stock</th>
                       <th class="text-center" width="100px">Qty</th>
                       <th class="text-center" width="200px;">Price</th>
                       <th class="text-center" width="200px;">Total</th>
@@ -125,6 +126,7 @@
                   <tbody>
                     <tr v-for="item in fields.items" :key="item.product">
                         <td>{{ item.name }}</td>
+                        <td>{{ item.stock }}</td>
                         <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" /></td>
                         <td class="text-right">{{ item.price | currency }}</td>
                         <td class="text-right">{{ item.qty * item.price | currency }}</td>
@@ -242,7 +244,7 @@ export default {
     this.page = page;
   },
   methods: {
-    ...mapActions(['getSoNo','getCustomer','getProduct','addSalesOrder','getSoItem','updateSalesOrder','getSalesOrder']),
+    ...mapActions(['getSoNo','getCustomer','getProduct','addSalesOrder','getSoItem','updateSalesOrder','getSalesOrder','checkStock']),
     getDateTime(date){
       const dates = new Date(date);
       const hours = new Date().getHours().toString();
@@ -295,11 +297,11 @@ export default {
       this.fields.user = this.user._id;
       this.fields.transdate = new Date();
     },
-    getItem(id){
+    async getItem(id){
         let data = {
           order: id
         }
-        this.getSoItem(data).then(res => {
+        await this.getSoItem(data).then(res => {
             if(res.data.success) {
                 let items = res.data.data;
                 this.fields.items = [];
@@ -308,11 +310,18 @@ export default {
                     name: item.product.name,
                     product: item.product._id,
                     price: item.price,
-                    qty: item.qty
+                    qty: item.qty,
+                    stock: item.qty
                   }
                   this.fields.items.push(item);
                 });
             }
+        });
+        let items = this.fields.items;
+        items.forEach(item => {
+          this.checkStock(item.product).then(res => {
+            item.stock = res.data.qty;
+          });
         });
     },
     addItem(){
@@ -325,8 +334,12 @@ export default {
           product: data._id,
           name: data.name,
           qty: 1,
-          price: data.price
+          price: data.price,
+          stock: 0
         }
+        this.checkStock(row.product).then(res => {
+          row.stock = res.data.qty;
+        });
         this.fields.items.push(row);
       }
       this.productSelected = {};

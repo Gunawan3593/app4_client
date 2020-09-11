@@ -143,6 +143,7 @@
                             </template>
                             <span>Warning : Stock is not enough !<br> If you still save the delivery, <br> Stock will have minus value</span>
                           </v-tooltip>
+                      </td>
                       <td><v-currency-field :decimal-length="0" place-holder="Qty" v-model="item.qty" @change="checkQty(index)" /></td>
                       <td class="text-right">{{ item.price | currency }}</td>
                       <td class="text-right">{{ item.qty * item.price | currency }}</td>
