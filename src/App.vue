@@ -210,6 +210,7 @@
       <v-container>
           <router-view :key="$route.fullPath"></router-view>
           <Alert :options="alert" />
+          <Whatsapp />
       </v-container>
     </v-main>
     <v-footer
@@ -223,6 +224,7 @@
 
 <script>
 import Alert from '@/components/Alert.vue';
+import Whatsapp from '@/components/Whatsapp.vue'
 import { mapGetters, mapActions } from 'vuex';
 export default {
   name: 'App',
@@ -233,7 +235,7 @@ export default {
     ...mapGetters(['user','isLoggedIn','alert'])
   },
   components: {
-    Alert
+    Alert, Whatsapp
   },
   created() {
     this.getProfile();

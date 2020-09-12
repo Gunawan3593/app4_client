@@ -23,7 +23,7 @@
             <v-list-item-avatar
                 tile
                 size="80"
-                color="grey"
+                color="blue darken-1"
             ><v-icon x-large dark>mdi-cart</v-icon></v-list-item-avatar>
             </v-list-item>
         </v-card>
@@ -48,7 +48,7 @@
             <v-list-item-avatar
                 tile
                 size="80"
-                color="grey"
+                color="light-green"
             ><v-icon x-large dark>mdi-shopping</v-icon></v-list-item-avatar>
             </v-list-item>
         </v-card>
@@ -73,7 +73,7 @@
             <v-list-item-avatar
                 tile
                 size="80"
-                color="grey"
+                color="orange lighten-1"
             ><v-icon x-large dark>mdi-shopping-search</v-icon></v-list-item-avatar>
             </v-list-item>
         </v-card>
@@ -95,16 +95,19 @@
             <v-sparkline
                 :labels="hourLabels"
                 :value="hourValue"
+                :gradient="gradient"
                 color="white"
-                line-width="1"
+                line-width="2"
+                smooth="16"
                 padding="16"
+                height="100"
                 auto-draw
             ></v-sparkline>
             </v-sheet>
 
             <v-card-text class="pt-0">
             <div class="title font-weight-light mb-2">Today's Sales</div>
-            <div class="subheading font-weight-light grey--text">Sales order every 3 hours</div>
+            <div class="subheading font-weight-light grey--text">Sales counter every hour</div>
             <v-divider class="my-2"></v-divider>
             <v-icon
                 class="mr-2"
@@ -112,7 +115,7 @@
             >
                 mdi-clock
             </v-icon>
-            <span class="caption grey--text font-weight-light">last order 26 minutes ago</span>
+            <span class="caption grey--text font-weight-light">Updated {{ sales.lastUpdated | moment('from') }}</span>
             </v-card-text>
         </v-card>
     </v-col>
@@ -133,16 +136,19 @@
             <v-sparkline
                 :labels="dayLabels"
                 :value="dayValue"
+                :gradient="gradient"
                 color="white"
-                line-width="1"
+                line-width="2"
+                smooth="16"
                 padding="16"
+                height="100"
                 auto-draw
             ></v-sparkline>
             </v-sheet>
 
             <v-card-text class="pt-0">
             <div class="title font-weight-light mb-2">Daily Sales</div>
-            <div class="subheading font-weight-light grey--text">Sales order everyday</div>
+            <div class="subheading font-weight-light grey--text">Sales counter by day of week</div>
             <v-divider class="my-2"></v-divider>
             <v-icon
                 class="mr-2"
@@ -150,7 +156,7 @@
             >
                 mdi-clock
             </v-icon>
-            <span class="caption grey--text font-weight-light">last order 26 minutes ago</span>
+            <span class="caption grey--text font-weight-light">Updated {{ sales.lastUpdated | moment('from') }}</span>
             </v-card-text>
         </v-card>
     </v-col>
@@ -161,6 +167,7 @@
 import { mapActions  } from 'vuex';
  export default {
     data: () => ({
+      gradient : ['#f72047', '#ffd200', '#1feaea'],
       total : {
           order : 0,
           sales : 0
@@ -168,15 +175,34 @@ import { mapActions  } from 'vuex';
       top : {
           product : {}
       },
+      sales : {
+          lastUpdated : new Date()
+      },
       hourLabels: [
-        '08:00',
-        '11:00',
-        '14:00',
-        '17:00',
-        '20:00',
-        '23:00',
+        '00:00',
+        '01:00',
         '02:00',
+        '03:00',
+        '04:00',
         '05:00',
+        '06:00',
+        '07:00',
+        '08:00',
+        '09:00',
+        '10:00',
+        '11:00',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+        '16:00',
+        '17:00',
+        '18:00',
+        '19:00',
+        '20:00',
+        '21:00',
+        '22:00',
+        '23:00',
       ],
       hourValue: [],
       dayLabels: [
@@ -188,18 +214,18 @@ import { mapActions  } from 'vuex';
         'Sat',
         'Sun'
       ],
-      dayValue: [
-        100000,
-        50000,
-        30000,
-        40000,
-        80000,
-        90000,
-        40000
-      ],
+      dayValue: [],
     }),
     methods: {
-        ...mapActions(['getSalesOrderByMonth','getSalesInvoiceByMonth','getTopSellProductByMonth','getSalesByTime']),
+        ...mapActions(['getSalesOrderByMonth','getSalesInvoiceByMonth','getTopSellProductByMonth','getSalesByTime','getSalesOtw','getLastUpdateSales']),
+        getDateTime(date){
+            const dates = new Date(date);
+            const hours = dates.getHours().toString();
+            const minutes = dates.getMinutes().toString();
+            const seconds = dates.getSeconds().toString();
+            let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
+            return dates.toISOString().slice(0,10) + ' ' + time;
+        },
     },
     async mounted(){
         let res = await this.getSalesOrderByMonth(new Date());
@@ -217,37 +243,147 @@ import { mapActions  } from 'vuex';
         res = await this.getSalesByTime(new Date());
         if (res.data.success){
             let data = res.data.data;
-            let hours = [800,1100,1400,1700,2000,2300,200,500];
-            this.hourValue.push([0,0,0,0,0,0,0,0]);
+            let hours = [0];
+            for (var i=1;i<=23;i++){
+                hours.push(i*100);
+            }
+            let date = new Date();
+            let curHours = date.getHours().toString();
+            let curMinutes = date.getMinutes().toString();
+            let curTime = ('00'+curHours).substring(curHours.length) + '' + ('00'+curMinutes).substring(curMinutes.length)
             let time = 0;
             data.forEach(row => {
                 time = parseInt(row._id);
-                if (time <= hours[0] && time > hours[7]) {
-                    this.hourValue[0] += row.total;
-                }
-                if (time <= hours[1] && time > hours[0]) {
-                    this.hourValue[1] += row.total;
-                }
-                if (time <= hours[2] && time > hours[1]) {
-                    this.hourValue[2] += row.total;
-                }
-                if (time <= hours[3] && time > hours[2]) {
-                    this.hourValue[3] += row.total;
-                }
-                if (time <= hours[4] && time > hours[3]) {
-                    this.hourValue[4] += row.total;
-                }
-                if (time <= hours[5] && time > hours[4]) {
-                    this.hourValue[5] += row.total;
-                }
-                if (time <= hours[6] && time > hours[5]) {
-                    this.hourValue[6] += row.total;
-                }
-                if (time <= hours[7] && time > hours[6]) {
-                    this.hourValue[7] += row.total;
-                }
+                hours.forEach((hour,i) => {
+                    if(hours[i] <= parseInt(curTime)) {
+                        if (time >= hours[i]  && time < hours[i+1]) {
+                            if(this.hourValue[i] == undefined) {
+                                this.hourValue.push(0)
+                            }
+                            this.hourValue[i] += row.total;
+                        }else{
+                            if(this.hourValue[i] == undefined) {
+                                this.hourValue.push(0)
+                            }
+                        }
+                    }else{
+                        return;
+                    }
+                })
             });
-            console.log(this.hourValue);
+            res = await this.getSalesOtw(new Date());
+            if (res.data.success){
+                let data = res.data.data;
+                let dow = [1,2,3,4,5,6,7,8];
+                let date = new Date();
+                let curDay = date.getDay();
+                let day = 0;
+                data.forEach(row=>{
+                    day = row._id;
+                    if(dow[0] <= curDay) {
+                        if (day == dow[0]) {
+                            if(this.dayValue[0] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                            this.dayValue[0] += row.total;
+                        }else{
+                            if(this.dayValue[0] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                        }
+                    }else{
+                        return;
+                    }
+                    if(dow[1] <= curDay) {
+                        if (day == dow[1]) {
+                            if(this.dayValue[1] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                            this.dayValue[1] += row.total;
+                        }else{
+                            if(this.dayValue[1] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                        }
+                    }else{
+                        return;
+                    }
+                    if(dow[2] <= curDay) {
+                        if (day == dow[2]) {
+                            if(this.dayValue[2] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                            this.dayValue[2] += row.total;
+                        }else{
+                            if(this.dayValue[2] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                        }
+                    }else{
+                        return;
+                    }
+                    if(dow[3] <= curDay) {
+                        if (day == dow[3]) {
+                            if(this.dayValue[3] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                            this.dayValue[3] += row.total;
+                        }else{
+                            if(this.dayValue[3] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                        }
+                    }else{
+                        return;
+                    }
+                    if(dow[4] <= curDay) {
+                        if (day == dow[4]) {
+                            if(this.dayValue[4] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                            this.dayValue[4] += row.total;
+                        }else{
+                            if(this.dayValue[4] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                        }
+                    }else{
+                        return;
+                    }
+                    if(dow[5] <= curDay) {
+                        if (day == dow[5]) {
+                            if(this.dayValue[5] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                            this.dayValue[5] += row.total;
+                        }else{
+                            if(this.dayValue[5] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                        }
+                    }else{
+                        return;
+                    }
+                    if(dow[6] <= curDay) {
+                        if (day == dow[6]) {
+                            if(this.dayValue[6] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                            this.dayValue[6] += row.total;
+                        }else{
+                            if(this.dayValue[6] == undefined) {
+                                this.dayValue.push(0)
+                            }
+                        }
+                    }else{
+                        return;
+                    }
+                });
+                res = await this.getLastUpdateSales();
+                if(res.data.success){
+                    this.sales.lastUpdated = res.data.date;
+                }
+            }
         }
     }
   }

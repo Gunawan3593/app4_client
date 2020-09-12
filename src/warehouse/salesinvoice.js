@@ -203,8 +203,38 @@ const actions = {
         }catch(err){
             commit('salesInvoice_Api_error',err);
         }
+    },
+    // Get sales of the week
+    async getSalesOtw({ commit }, data) {
+        try {
+            let date = new Date(data).toISOString().slice(0,10);
+            commit('salesInvoice_request');
+            let res = await axios.get(apiPath+'/api/sales/invoices/salesotw/'+date);
+            if (res.data.success !== undefined) {
+                commit('salesInvoice_success', res);
+            }else{
+                return commit('salesInvoice_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('salesInvoice_Api_error',err);
+        }
+    },
+    // Get last update sales
+    async getLastUpdateSales({ commit }) {
+        try {
+            commit('salesInvoice_request');
+            let res = await axios.get(apiPath+'/api/sales/invoices/lastupdatesales');
+            if (res.data.success !== undefined) {
+                commit('salesInvoice_success', res);
+            }else{
+                return commit('salesInvoice_error',res);
+            }
+            return res;
+        }catch(err){
+            commit('salesInvoice_Api_error',err);
+        }
     }
-
 }
 
 const mutations = {

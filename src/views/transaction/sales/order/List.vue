@@ -56,7 +56,7 @@
                 color="orange"
                 text-color="white"
               >
-                Deliveriying
+                Delivering
               </v-chip>
               <v-chip
                 v-if="item.status == 2"
