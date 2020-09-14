@@ -106,8 +106,10 @@
                     v-if="item.status == 2"
                     class="mr-2"
                     small
+                    :loading="isLoading"
+                    :disabled="isLoading"
                     @click="genInvoice(item)"
-                    v-bind="attrs" 
+                    v-bind="attrs"
                     v-on="on"
                   >
                     mdi-file-move-outline
@@ -144,6 +146,7 @@ export default {
     return {
       search: '',
       page: 1,
+      isLoading: false,
       headers: [
         {
           text: 'No.',
@@ -198,6 +201,7 @@ export default {
       this.$router.push({ path: '/purchase/order/show/'+item._id, query: { page: this.page }});
     },
     async genInvoice(item){
+      this.isLoading = true;
       let items = await this.getItem(item._id);
       let data = {
         transdate: this.getDateTime(new Date()),
@@ -209,6 +213,7 @@ export default {
       }
       this.genPurchaseInvoice(data).then(res => {
         if(res.data.success) {
+            this.isLoading = false;
             this.loadData();
         }
       });

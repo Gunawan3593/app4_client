@@ -203,7 +203,7 @@ export default {
                 let rspn = res.data.data;
                 this.id = id;
                 this.no = rspn.no;
-                this.date = this.getDateTime(rspn.date);
+                this.date = this.getDateTime(rspn.transdate);
                 this.supplier = rspn.supplier;
                 this.notes = rspn.notes;
                 this.status = rspn.status;
@@ -265,6 +265,6 @@ export default {
 </script>
 
 <style scoped>
-    table th + th { binvoice-left:1px solid #dddddd; }
-    table td + td { binvoice-left:1px solid #dddddd; }
+    table th + th { border-left:1px solid #dddddd; }
+    table td + td { border-left:1px solid #dddddd; }
 </style>

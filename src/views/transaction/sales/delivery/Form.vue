@@ -31,7 +31,7 @@
               </v-tooltip>
               <v-tooltip left>
               <template v-slot:activator="{ on, attrs}">
-                <v-btn icon color="dee-orange" :loading="isLoading"  @click="submit" v-bind="attrs" v-on="on"><v-icon>mdi-content-save-move-outline</v-icon></v-btn>
+                <v-btn icon color="dee-orange" :loading="isLoading" :disabled="isLoading" @click="submit" v-bind="attrs" v-on="on"><v-icon>mdi-content-save-move-outline</v-icon></v-btn>
               </template>
               <span>Save Data</span>
               </v-tooltip>
@@ -295,19 +295,19 @@ export default {
       }
     },
     addData() {
-        this.isloading = true;
+        this.isLoading = true;
         this.addSalesDelivery(this.fields).then(res => {
             if(res.data.success) {
-                this.isloading = false;
+                this.isLoading = false;
                 this.$router.push('/sales/delivery/list');
             }
         })
     },
     updateData() {
-        this.isloading = true;
+        this.isLoading = true;
         this.updateSalesDelivery(this.fields).then(res => {
             if(res.data.success) {
-                this.isloading = false;
+                this.isLoading = false;
                 this.$router.push({ name : 'sdlist', params: { page : this.page }});
             }
         })

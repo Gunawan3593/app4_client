@@ -31,7 +31,7 @@
               </v-tooltip>
               <v-tooltip left>
               <template v-slot:activator="{ on, attrs}">
-                <v-btn icon color="dee-orange" :loading="isLoading"  @click="submit" v-bind="attrs" v-on="on"><v-icon>mdi-content-save-move-outline</v-icon></v-btn>
+                <v-btn icon color="dee-orange" :loading="isLoading" :disabled="isLoading"  @click="submit" v-bind="attrs" v-on="on"><v-icon>mdi-content-save-move-outline</v-icon></v-btn>
               </template>
               <span>Save Data</span>
               </v-tooltip>
@@ -267,19 +267,19 @@ export default {
       this.date = rspn.transdate.slice(0,10);
     },
     addData() {
-        this.isloading = true;
+        this.isLoading = true;
         this.addPurchaseOrder(this.fields).then(res => {
             if(res.data.success) {
-                this.isloading = false;
+                this.isLoading = false;
                 this.$router.push('/purchase/order/list');
             }
         })
     },
     updateData() {
-        this.isloading = true;
+        this.isLoading = true;
         this.updatePurchaseOrder(this.fields).then(res => {
             if(res.data.success) {
-                this.isloading = false;
+                this.isLoading = false;
                 this.$router.push({ name : 'polist', params: { page : this.page }});
             }
         })

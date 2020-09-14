@@ -203,7 +203,7 @@ export default {
                 let rspn = res.data.data;
                 this.id = id;
                 this.no = rspn.no;
-                this.date = this.getDateTime(rspn.date);
+                this.date = this.getDateTime(rspn.transdate);
                 this.customer = rspn.customer;
                 this.notes = rspn.notes;
                 this.status = rspn.status;
