@@ -252,7 +252,7 @@ export default {
       const minutes = new Date().getMinutes().toString();
       const seconds = new Date().getSeconds().toString();
       let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
-      return dates.toISOString().slice(0,10) + ' ' + time;
+      return new Date(dates.toISOString().slice(0,10) + ' ' + time);
     },
     async loadData(id) {
       let res = await this.getPurchaseReceipt(id);

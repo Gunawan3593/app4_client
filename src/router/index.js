@@ -12,6 +12,9 @@ const routes = [
         path: '/',
         name: 'home',
         component: () => import('../views/Home.vue'),
+        meta: {
+          requiresAuth: true
+        }
     },
     {
         path: '/category',
@@ -272,7 +275,10 @@ const routes = [
     {
       path: '/inventory',
       name: 'inventory',
-      component: () => import('../views/Inventory.vue')
+      component: () => import('../views/Inventory.vue'),
+      meta: {
+        requiresAuth: true
+      }
     },
     {
         path: '/login',

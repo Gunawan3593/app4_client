@@ -204,7 +204,7 @@ export default {
       this.isLoading = true;
       let items = await this.getItem(item._id);
       let data = {
-        transdate: this.getDateTime(new Date()),
+        transdate: new Date(),
         customer: item.customer._id,
         order: item._id,
         notes: 'Generate Invoice Automatically.',
