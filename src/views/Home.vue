@@ -324,6 +324,11 @@ import { mapActions  } from 'vuex';
                         }
                     });
                 });
+                if(data.length == 0){
+                    for(let i=this.dayValue.length;i<dows.length;i++){
+                        this.dayValue.push(0)
+                    }
+                }
                 //redraw hour label 
                 dows.forEach(dow=>{
                     dow = this.getDayName(dow);
