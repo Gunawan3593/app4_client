@@ -8,6 +8,10 @@ import VueCurrencyFilter from 'vue-currency-filter';
 import VCurrencyField from 'v-currency-field';
 import { VTextField } from 'vuetify/lib';  //Globally import VTextField
 
+import VueApexCharts from 'vue-apexcharts'
+
+Vue.component('apexchart', VueApexCharts)
+
 Vue.use(require('vue-moment'));
 
 Vue.component('v-text-field', VTextField);
