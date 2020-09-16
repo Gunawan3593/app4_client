@@ -183,7 +183,7 @@ import { mapActions  } from 'vuex';
                 let hours = [];
                 let date = new Date();
                 let curHours = date.getHours().toString();
-                let curTime = parseInt(('00'+curHours).substring(curHours.length) + '00');
+                let curTime = parseInt(('00'+curHours).substring(curHours.length) + '00') + 100 ;
                 let period = 800;
                 let time = 0;
                 let startTime = curTime - period;
@@ -224,7 +224,7 @@ import { mapActions  } from 'vuex';
                         hours.push(i*100);
                     }
                 }else{
-                    let startDay = startTime;
+                    let startDay = startTime-100;
                     let limit = period / 100;
                     for(let i=0;i<limit;i++){
                         startDay += 100;

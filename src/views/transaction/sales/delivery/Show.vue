@@ -171,7 +171,13 @@ export default {
             const minutes = dates.getMinutes().toString();
             const seconds = dates.getSeconds().toString();
             let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
-            return dates.toISOString().slice(0,10) + ' ' + time;
+            let strDate = this.getDate(dates);
+            return strDate + ' ' + time;
+        },
+        getDate(date){
+            const offset = date.getTimezoneOffset();
+            date = new Date(date.getTime() - (offset*60*1000));
+            return date.toISOString().split('T')[0];
         },
         getItem(id){
             let data = {

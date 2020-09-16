@@ -252,7 +252,13 @@ export default {
       const minutes = new Date().getMinutes().toString();
       const seconds = new Date().getSeconds().toString();
       let time = ('00'+hours).substring(hours.length) + ':' + ('00'+minutes).substring(minutes.length) + ':' + ('00'+seconds).substring(seconds.length);
-      return new Date(dates.toISOString().slice(0,10) + ' ' + time);
+      let strDate = this.getDate(dates);
+      return new Date(strDate + ' ' + time);
+    },
+    getDate(date){
+      const offset = date.getTimezoneOffset();
+      date = new Date(date.getTime() - (offset*60*1000));
+      return date.toISOString().split('T')[0];
     },
     async loadData(id) {
       let res = await this.getSalesReturn(id);
@@ -269,7 +275,7 @@ export default {
       this.fields.customer = rspn.customer._id;
       this.getItem(id);
       this.fields.transdate = rspn.transdate;
-      this.date = rspn.transdate.slice(0,10);
+      this.date = this.getDate(new Date(rspn.transdate));
     },
     async loadInvoice(id){
       let res = await this.getSalesInvoiceReturnable(id);
@@ -304,7 +310,7 @@ export default {
       let data = await this.getSrNo();
       this.fields.id = false;
       this.fields.no = data.data.code;
-      this.date = new Date().toISOString().slice(0,10);
+      this.date = this.getDate(new Date());
       this.fields.customer = '';
       this.fields.notes = '';
       this.fields.items = [];
