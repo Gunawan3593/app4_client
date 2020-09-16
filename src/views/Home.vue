@@ -16,7 +16,7 @@
             <v-list-item three-line>
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1">ORDER</v-list-item-title>
-                <v-list-item-subtitle>Total Order This Month</v-list-item-subtitle>
+                <v-list-item-subtitle>Total Order {{ month }}</v-list-item-subtitle>
                 {{ total.order | currency }}
             </v-list-item-content>
 
@@ -41,7 +41,7 @@
             <v-list-item three-line>
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1">SALES</v-list-item-title>
-                <v-list-item-subtitle>Total Sales This Month</v-list-item-subtitle>
+                <v-list-item-subtitle>Total Sales {{ month }}</v-list-item-subtitle>
                 {{ total.sales | currency }}
             </v-list-item-content>
 
@@ -66,7 +66,7 @@
             <v-list-item three-line>
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1">TOP PRODUCT</v-list-item-title>
-                <v-list-item-subtitle>Top Product This Month</v-list-item-subtitle>
+                <v-list-item-subtitle>Top Product {{ month }}</v-list-item-subtitle>
                 {{ top.product.name }} : {{ top.product.total | currency }}
             </v-list-item-content>
 
@@ -89,7 +89,7 @@
             <apexchart type="line" :options="optChartTime" :series="srsChartTime"></apexchart>
             <v-card-text class="pt-0">
             <div class="title font-weight-light mb-2">Today's Sales</div>
-            <div class="subheading font-weight-light grey--text">Sales last 8 hour counter</div>
+            <div class="subheading font-weight-light grey--text">Last 8 hours sales counter</div>
             <v-divider class="my-2"></v-divider>
             <v-icon
                 class="mr-2"
@@ -109,10 +109,12 @@
       <v-card
             class="mt-4 mx-auto"
         >
+            <div id="chart">
             <apexchart type="line" :options="optChartWeek" :series="srsChartWeek"></apexchart>
+            </div>
             <v-card-text class="pt-0">
             <div class="title font-weight-light mb-2">Daily Sales</div>
-            <div class="subheading font-weight-light grey--text">Sales counter by day of week</div>
+            <div class="subheading font-weight-light grey--text">Last 7 days sales counter</div>
             <v-divider class="my-2"></v-divider>
             <v-icon
                 class="mr-2"
@@ -124,20 +126,6 @@
             </v-card-text>
         </v-card>
     </v-col>
-    <v-col
-      cols="12"
-      sm="12"
-      md="6"
-    >
-    
-    </v-col>
-    <v-col
-      cols="12"
-      sm="12"
-      md="6"
-    >
-    
-    </v-col>
     </v-row>
 </template>
 
@@ -146,11 +134,11 @@ import { mapActions  } from 'vuex';
 
  export default {
     data: () => ({
+      month: '',
       optChartTime: {},
       srsChartTime: [],
       optChartWeek: {},
       srsChartWeek: [],
-      gradient : ['#f72047', '#ffd200', '#1feaea'],
       total : {
           order : 0,
           sales : 0
@@ -284,12 +272,12 @@ import { mapActions  } from 'vuex';
                             dows.forEach((dow, i) => {
                                 if (day == dow) {
                                     if(this.dayValue[i] == undefined) {
-                                        this.dayValue.push(i)
+                                        this.dayValue.push(0)
                                     }
                                     this.dayValue[i] += row.total;
                                 }else{
                                     if(this.dayValue[i] == undefined) {
-                                        this.dayValue.push(i)
+                                        this.dayValue.push(0)
                                     }
                                 }
                             });
@@ -314,12 +302,12 @@ import { mapActions  } from 'vuex';
                     dows.forEach((dow, i) => {
                         if (day == dow) {
                             if(this.dayValue[i] == undefined) {
-                                this.dayValue.push(i)
+                                this.dayValue.push(0)
                             }
                             this.dayValue[i] += row.total;
                         }else{
                             if(this.dayValue[i] == undefined) {
-                                this.dayValue.push(i)
+                                this.dayValue.push(0)
                             }
                         }
                     });
@@ -359,6 +347,11 @@ import { mapActions  } from 'vuex';
             let days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
             let dayname = days[day-1];
             return dayname;
+        },
+        getMonthName(month){
+            let months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            let monthname = months[month];
+            return monthname;
         }
     },
     async mounted(){
@@ -380,8 +373,46 @@ import { mapActions  } from 'vuex';
         }
     },
     async created() {
+        this.month = this.getMonthName(new Date().getMonth())
         await this.drawchartTime();
         this.optChartTime = {
+            chart: {
+                zoom: {
+                enabled: false
+                },
+            },
+            stroke: {
+              width: 5,
+              curve: 'smooth'
+            },
+            markers: {
+              size: 4,
+              colors: ["#FFA41B"],
+              strokeColors: "#fff",
+              strokeWidth: 2,
+              hover: {
+                size: 7,
+              }
+            },
+            fill: {
+              type: 'gradient',
+              gradient: {
+                shade: 'dark',
+                gradientToColors: [ '#FDD835'],
+                shadeIntensity: 1,
+                type: 'horizontal',
+                opacityFrom: 1,
+                opacityTo: 1,
+                stops: [0, 100, 100, 100]
+              },
+            },
+            grid: {
+              borderColor: '#e7e7e7',
+              row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5
+              },
+            },
             xaxis: {
                 categories : this.hourLabels
             },
@@ -399,6 +430,43 @@ import { mapActions  } from 'vuex';
         });
         await this.drawchartWeek();
         this.optChartWeek = {
+            chart: {
+              zoom: {
+                enabled: false
+              }
+            },
+            stroke: {
+              width: 5,
+              curve: 'smooth'
+            },
+            markers: {
+              size: 4,
+              colors: ["#FFA41B"],
+              strokeColors: "#fff",
+              strokeWidth: 2,
+              hover: {
+                size: 7,
+              }
+            },
+            fill: {
+              type: 'gradient',
+              gradient: {
+                shade: 'dark',
+                gradientToColors: [ '#FDD835'],
+                shadeIntensity: 1,
+                type: 'horizontal',
+                opacityFrom: 1,
+                opacityTo: 1,
+                stops: [0, 100, 100, 100]
+              },
+            },
+            grid: {
+              borderColor: '#e7e7e7',
+              row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5
+              },
+            },
             xaxis: {
                 categories : this.dayLabels
             },
